@@ -12,6 +12,11 @@ import nablarch.integration.micrometer.MicrometerConfiguration;
 public class SimpleMeterRegistryFactory extends MeterRegistryFactory<SimpleMeterRegistry> {
 
     @Override
+    public SimpleMeterRegistry createObject() {
+        return doCreateObject();
+    }
+
+    @Override
     protected SimpleMeterRegistry createMeterRegistry(MicrometerConfiguration micrometerConfiguration) {
         NablarchSimpleConfig config = new NablarchSimpleConfig(prefix, micrometerConfiguration);
         return new SimpleMeterRegistry(config, Clock.SYSTEM);

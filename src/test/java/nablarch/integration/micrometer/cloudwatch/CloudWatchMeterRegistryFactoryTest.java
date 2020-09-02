@@ -4,7 +4,6 @@ import io.micrometer.cloudwatch2.CloudWatchMeterRegistry;
 import mockit.Deencapsulation;
 import mockit.Mocked;
 import mockit.Verifications;
-import nablarch.integration.micrometer.MicrometerConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
@@ -22,16 +21,16 @@ public class CloudWatchMeterRegistryFactoryTest {
     private CloudWatchAsyncClient cloudWatchAsyncClient;
 
     private CloudWatchMeterRegistryFactory sut = new CloudWatchMeterRegistryFactory();
-    private MicrometerConfiguration micrometerConfig = new MicrometerConfiguration("nablarch/integration/micrometer/cloudwatch/CloudWatchMeterRegistryFactoryTest/test.xml");
 
     @Before
     public void setup() {
         sut.setPrefix("test.cloudwatch");
+        sut.setXmlConfigPath("nablarch/integration/micrometer/cloudwatch/CloudWatchMeterRegistryFactoryTest/test.xml");
     }
 
     @Test
-    public void testCreateMeterRegistry() {
-        CloudWatchMeterRegistry meterRegistry = sut.createMeterRegistry(micrometerConfig);
+    public void testCreateObject() {
+        CloudWatchMeterRegistry meterRegistry = sut.createObject();
 
         NablarchCloudWatchConfig config = Deencapsulation.getField(meterRegistry, "config");
         assertThat(config.namespace(), is("cloudwatch-test-namespace"));
@@ -45,7 +44,7 @@ public class CloudWatchMeterRegistryFactoryTest {
     public void testCloudWatchAsyncClientProvider() {
         sut.setCloudWatchAsyncClientProvider(() -> cloudWatchAsyncClient);
 
-        CloudWatchMeterRegistry meterRegistry = sut.createMeterRegistry(micrometerConfig);
+        CloudWatchMeterRegistry meterRegistry = sut.createObject();
 
         CloudWatchAsyncClient cloudWatchAsyncClient = Deencapsulation.getField(meterRegistry, "cloudWatchAsyncClient");
         assertThat(cloudWatchAsyncClient, is(sameInstance(this.cloudWatchAsyncClient)));

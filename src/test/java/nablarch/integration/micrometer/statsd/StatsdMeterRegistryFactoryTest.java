@@ -15,12 +15,12 @@ import static org.hamcrest.Matchers.is;
 public class StatsdMeterRegistryFactoryTest {
 
     @Test
-    public void testCreateMeterRegistry() {
+    public void testCreateObject() {
         StatsdMeterRegistryFactory sut = new StatsdMeterRegistryFactory();
         sut.setPrefix("test.statsd");
-        MicrometerConfiguration micrometerConfig = new MicrometerConfiguration("nablarch/integration/micrometer/statsd/StatsdMeterRegistryFactory/testCreateMeterRegistry/test.xml");
+        sut.setXmlConfigPath("nablarch/integration/micrometer/statsd/StatsdMeterRegistryFactory/testCreateObject/test.xml");
 
-        StatsdMeterRegistry meterRegistry = sut.createMeterRegistry(micrometerConfig);
+        StatsdMeterRegistry meterRegistry = sut.createObject();
 
         NablarchStatsdConfig config = Deencapsulation.getField(meterRegistry, "statsdConfig");
         assertThat(config.host(), is("test-statsd-host"));

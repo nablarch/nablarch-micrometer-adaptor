@@ -12,6 +12,11 @@ import nablarch.integration.micrometer.MicrometerConfiguration;
 public class DatadogMeterRegistryFactory extends MeterRegistryFactory<DatadogMeterRegistry> {
 
     @Override
+    public DatadogMeterRegistry createObject() {
+        return doCreateObject();
+    }
+
+    @Override
     protected DatadogMeterRegistry createMeterRegistry(MicrometerConfiguration micrometerConfiguration) {
         DatadogConfig datadogConfig = new NablarchDatadogConfig(prefix, micrometerConfiguration);
         return DatadogMeterRegistry.builder(datadogConfig).build();

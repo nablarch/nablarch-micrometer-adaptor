@@ -39,8 +39,7 @@ public abstract class MeterRegistryFactory<T extends MeterRegistry> implements C
      */
     protected Map<String, String> tags = Collections.emptyMap();
 
-    @Override
-    public T createObject() {
+    protected T doCreateObject() {
         MicrometerConfiguration configuration = createMicrometerConfiguration();
         T meterRegistry = createMeterRegistry(configuration);
 

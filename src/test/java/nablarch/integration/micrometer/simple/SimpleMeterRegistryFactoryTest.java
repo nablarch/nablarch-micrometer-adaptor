@@ -17,12 +17,12 @@ import static org.hamcrest.Matchers.is;
 public class SimpleMeterRegistryFactoryTest {
 
     @Test
-    public void testCreateMeterRegistry() {
+    public void testCreateObject() {
         SimpleMeterRegistryFactory sut = new SimpleMeterRegistryFactory();
         sut.setPrefix("test.simple");
-        MicrometerConfiguration micrometerConfig = new MicrometerConfiguration("nablarch/integration/micrometer/simple/SimpleMeterRegistryFactory/testCreateMeterRegistry/test.xml");
+        sut.setXmlConfigPath("nablarch/integration/micrometer/simple/SimpleMeterRegistryFactory/testCreateObject/test.xml");
 
-        SimpleMeterRegistry meterRegistry = sut.createMeterRegistry(micrometerConfig);
+        SimpleMeterRegistry meterRegistry = sut.createObject();
 
         NablarchSimpleConfig config = Deencapsulation.getField(meterRegistry, "config");
         assertThat(config.step(), is(Duration.ofSeconds(3456)));

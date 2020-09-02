@@ -4,5 +4,5 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration https://nablarch.github.io/schema/component-configuration.xsd">
 
-  <config-file file="nablarch/integration/micrometer/datadog/DatadogMeterRegistryFactoryTest/testCreateMeterRegistry/test.properties" />
+  <config-file file="nablarch/integration/micrometer/logging/LoggingMeterRegistryFactory/testCreateObject/test.properties" />
 </component-configuration>

@@ -11,6 +11,11 @@ import nablarch.integration.micrometer.MicrometerConfiguration;
 public class StatsdMeterRegistryFactory extends MeterRegistryFactory<StatsdMeterRegistry> {
 
     @Override
+    public StatsdMeterRegistry createObject() {
+        return doCreateObject();
+    }
+
+    @Override
     protected StatsdMeterRegistry createMeterRegistry(MicrometerConfiguration micrometerConfiguration) {
         NablarchStatsdConfig config = new NablarchStatsdConfig(prefix, micrometerConfiguration);
         return StatsdMeterRegistry.builder(config).build();

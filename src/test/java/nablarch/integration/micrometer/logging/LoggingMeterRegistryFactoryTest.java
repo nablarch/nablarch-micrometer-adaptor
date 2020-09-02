@@ -2,7 +2,6 @@ package nablarch.integration.micrometer.logging;
 
 import io.micrometer.core.instrument.logging.LoggingMeterRegistry;
 import mockit.Deencapsulation;
-import nablarch.integration.micrometer.MicrometerConfiguration;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -15,12 +14,12 @@ import static org.hamcrest.Matchers.is;
 public class LoggingMeterRegistryFactoryTest {
 
     @Test
-    public void testCreateMeterRegistry() {
+    public void testCreateObject() {
         LoggingMeterRegistryFactory sut = new LoggingMeterRegistryFactory();
         sut.setPrefix("test.logging");
-        MicrometerConfiguration micrometerConfig = new MicrometerConfiguration("nablarch/integration/micrometer/logging/LoggingMeterRegistryFactory/testCreateMeterRegistry/test.xml");
+        sut.setXmlConfigPath("nablarch/integration/micrometer/logging/LoggingMeterRegistryFactory/testCreateObject/test.xml");
 
-        LoggingMeterRegistry meterRegistry = sut.createMeterRegistry(micrometerConfig);
+        LoggingMeterRegistry meterRegistry = sut.createObject();
 
         NablarchLoggingRegistryConfig config = Deencapsulation.getField(meterRegistry, "config");
         assertThat(config.batchSize(), is(98765));

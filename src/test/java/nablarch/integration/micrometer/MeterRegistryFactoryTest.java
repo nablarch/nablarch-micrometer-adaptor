@@ -4,6 +4,9 @@ import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import nablarch.core.repository.di.ComponentDefinitionLoader;
+import nablarch.core.repository.di.DiContainer;
+import nablarch.core.repository.di.config.xml.XmlComponentDefinitionLoader;
 import org.junit.Test;
 
 import java.util.*;
@@ -69,9 +72,23 @@ public class MeterRegistryFactoryTest {
         }
     }
 
+    @Test
+    public void testCreatedComponentCanBeResolvedByType() {
+        ComponentDefinitionLoader loader = new XmlComponentDefinitionLoader("nablarch/integration/micrometer/MeterRegistryFactoryTest/testCreatedComponentCanBeResolvedByType/components.xml");
+        DiContainer container = new DiContainer(loader);
+
+        assertThat(container.getComponentByType(FooRegistry.class), notNullValue());
+        assertThat(container.getComponentByType(BarRegistry.class), notNullValue());
+    }
+
     private static class MockMeterRegistryFactory extends MeterRegistryFactory<SimpleMeterRegistry> {
         private MicrometerConfiguration micrometerConfiguration;
         private SimpleMeterRegistry registry = new SimpleMeterRegistry();
+
+        @Override
+        public SimpleMeterRegistry createObject() {
+            return doCreateObject();
+        }
 
         @Override
         protected SimpleMeterRegistry createMeterRegistry(MicrometerConfiguration micrometerConfiguration) {
@@ -90,6 +107,35 @@ public class MeterRegistryFactoryTest {
                 boundMeterRegistries::add,
                 boundMeterRegistries::add
             );
+        }
+    }
+
+    public static class FooRegistry extends SimpleMeterRegistry {}
+    public static class BarRegistry extends SimpleMeterRegistry {}
+
+    public static class FooRegistryFactory extends MeterRegistryFactory<FooRegistry> {
+
+        @Override
+        public FooRegistry createObject() {
+            return doCreateObject();
+        }
+
+        @Override
+        protected FooRegistry createMeterRegistry(MicrometerConfiguration micrometerConfiguration) {
+            return new FooRegistry();
+        }
+    }
+
+    public static class BarRegistryFactory extends MeterRegistryFactory<BarRegistry> {
+
+        @Override
+        public BarRegistry createObject() {
+            return doCreateObject();
+        }
+
+        @Override
+        protected BarRegistry createMeterRegistry(MicrometerConfiguration micrometerConfiguration) {
+            return new BarRegistry();
         }
     }
 }

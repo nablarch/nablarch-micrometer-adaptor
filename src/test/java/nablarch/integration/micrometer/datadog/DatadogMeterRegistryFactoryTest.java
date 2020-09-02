@@ -2,7 +2,6 @@ package nablarch.integration.micrometer.datadog;
 
 import io.micrometer.datadog.DatadogMeterRegistry;
 import mockit.Deencapsulation;
-import nablarch.integration.micrometer.MicrometerConfiguration;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -15,12 +14,12 @@ import static org.hamcrest.Matchers.is;
 public class DatadogMeterRegistryFactoryTest {
 
     @Test
-    public void testCreateMeterRegistry() {
+    public void testCreateObject() {
         DatadogMeterRegistryFactory sut = new DatadogMeterRegistryFactory();
         sut.setPrefix("test.datadog");
-        MicrometerConfiguration micrometerConfig = new MicrometerConfiguration("nablarch/integration/micrometer/datadog/DatadogMeterRegistryFactoryTest/testCreateMeterRegistry/test.xml");
+        sut.setXmlConfigPath("nablarch/integration/micrometer/datadog/DatadogMeterRegistryFactoryTest/testCreateObject/test.xml");
 
-        DatadogMeterRegistry meterRegistry = sut.createMeterRegistry(micrometerConfig);
+        DatadogMeterRegistry meterRegistry = sut.createObject();
 
         NablarchDatadogConfig config = Deencapsulation.getField(meterRegistry, "config");
         assertThat(config.apiKey(), is("datadog-test-api-key"));
