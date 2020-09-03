@@ -4,6 +4,7 @@ import io.micrometer.cloudwatch2.CloudWatchMeterRegistry;
 import mockit.Deencapsulation;
 import mockit.Mocked;
 import mockit.Verifications;
+import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
 import org.junit.Before;
 import org.junit.Test;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
@@ -24,6 +25,7 @@ public class CloudWatchMeterRegistryFactoryTest {
 
     @Before
     public void setup() {
+        sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
         sut.setPrefix("test.cloudwatch");
         sut.setXmlConfigPath("nablarch/integration/micrometer/cloudwatch/CloudWatchMeterRegistryFactoryTest/test.xml");
     }

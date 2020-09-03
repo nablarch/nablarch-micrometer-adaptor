@@ -2,6 +2,7 @@ package nablarch.integration.micrometer.simple;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import mockit.Deencapsulation;
+import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
 import nablarch.integration.micrometer.MicrometerConfiguration;
 import org.junit.Test;
 
@@ -19,6 +20,7 @@ public class SimpleMeterRegistryFactoryTest {
     @Test
     public void testCreateObject() {
         SimpleMeterRegistryFactory sut = new SimpleMeterRegistryFactory();
+        sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
         sut.setPrefix("test.simple");
         sut.setXmlConfigPath("nablarch/integration/micrometer/simple/SimpleMeterRegistryFactory/testCreateObject/test.xml");
 

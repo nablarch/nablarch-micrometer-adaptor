@@ -3,7 +3,13 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://tis.co.jp/nablarch/component-configuration"
         xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration  https://nablarch.github.io/schema/component-configuration.xsd">
 
-    <component class="nablarch.integration.micrometer.MeterRegistryFactoryTest$FooRegistryFactory" />
-    <component class="nablarch.integration.micrometer.MeterRegistryFactoryTest$BarRegistryFactory" />
+    <component name="meterBinderListProvider" class="nablarch.integration.micrometer.DefaultMeterBinderListProvider" />
 
+    <component class="nablarch.integration.micrometer.MeterRegistryFactoryTest$FooRegistryFactory">
+        <property name="meterBinderListProvider" ref="meterBinderListProvider" />
+    </component>
+
+    <component class="nablarch.integration.micrometer.MeterRegistryFactoryTest$BarRegistryFactory">
+        <property name="meterBinderListProvider" ref="meterBinderListProvider" />
+    </component>
 </component-configuration>

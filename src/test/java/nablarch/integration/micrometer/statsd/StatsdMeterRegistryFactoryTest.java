@@ -2,6 +2,7 @@ package nablarch.integration.micrometer.statsd;
 
 import io.micrometer.statsd.StatsdMeterRegistry;
 import mockit.Deencapsulation;
+import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
 import nablarch.integration.micrometer.MicrometerConfiguration;
 import org.junit.Test;
 
@@ -17,6 +18,7 @@ public class StatsdMeterRegistryFactoryTest {
     @Test
     public void testCreateObject() {
         StatsdMeterRegistryFactory sut = new StatsdMeterRegistryFactory();
+        sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
         sut.setPrefix("test.statsd");
         sut.setXmlConfigPath("nablarch/integration/micrometer/statsd/StatsdMeterRegistryFactory/testCreateObject/test.xml");
 

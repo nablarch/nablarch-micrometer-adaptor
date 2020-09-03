@@ -8,10 +8,15 @@ import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
-import io.micrometer.core.instrument.binder.tomcat.TomcatMetrics;
+import mockit.Expectations;
+import mockit.Mocked;
+import mockit.Verifications;
 import nablarch.integration.micrometer.instrument.binder.jvm.NablarchGcCountMetrics;
+import nablarch.test.support.log.app.OnMemoryLogWriter;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -23,6 +28,11 @@ import static org.hamcrest.Matchers.instanceOf;
  * @author Tanaka Tomoyuki
  */
 public class DefaultMeterBinderListProviderTest {
+
+    @Before
+    public void setUp() {
+        OnMemoryLogWriter.clear();
+    }
 
     @Test
     public void testDefaultProvidedMetricsList() {
@@ -39,5 +49,34 @@ public class DefaultMeterBinderListProviderTest {
             instanceOf(UptimeMetrics.class),
             instanceOf(NablarchGcCountMetrics.class)
         ));
+    }
+
+    @Mocked
+    private JvmGcMetrics jvmGcMetrics;
+
+    @Test
+    public void testDisposeAutoCloseableMeterBinder() {
+        DefaultMeterBinderListProvider sut = new DefaultMeterBinderListProvider();
+
+        sut.dispose();
+
+        new Verifications() {{
+            jvmGcMetrics.close(); times = 1;
+        }};
+    }
+
+    @Test
+    public void testWarningLogIfCloseThrowsException() {
+        new Expectations() {{
+            jvmGcMetrics.close(); result = new IOException("test IOException");
+        }};
+
+        DefaultMeterBinderListProvider sut = new DefaultMeterBinderListProvider();
+
+        sut.dispose();
+
+        OnMemoryLogWriter.assertLogContains("writer.appLog",
+                "WARN ROOT Failed to close MeterBinder(io.micrometer.core.instrument.binder.jvm.JvmGcMetrics",
+                "test IOException");
     }
 }

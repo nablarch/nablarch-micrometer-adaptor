@@ -7,22 +7,29 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import nablarch.core.repository.di.ComponentDefinitionLoader;
 import nablarch.core.repository.di.DiContainer;
 import nablarch.core.repository.di.config.xml.XmlComponentDefinitionLoader;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThrows;
 
 /**
  * {@link MeterRegistryFactory}の単体テスト。
  * @author Tanaka Tomoyuki
  */
 public class MeterRegistryFactoryTest {
+    private MockMeterRegistryFactory sut = new MockMeterRegistryFactory();
+
+    @Before
+    public void setUp() {
+        sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
+    }
 
     @Test
     public void testLoadConfigurationAtClasspathRootIfXmlConfigPathIsNotSet() {
-        MockMeterRegistryFactory sut = new MockMeterRegistryFactory();
         sut.createObject();
 
         Object value = sut.micrometerConfiguration.getComponentByName("foo.bar");
@@ -31,7 +38,6 @@ public class MeterRegistryFactoryTest {
 
     @Test
     public void testLoadConfigurationSpecifiedByXmlConfigPath() {
-        MockMeterRegistryFactory sut = new MockMeterRegistryFactory();
         sut.setXmlConfigPath("nablarch/integration/micrometer/MeterRegistryFactoryTest/testLoadConfigurationSpecifiedByXmlConfigPath/test.xml");
         sut.createObject();
 
@@ -40,15 +46,7 @@ public class MeterRegistryFactoryTest {
     }
 
     @Test
-    public void testDefaultMeterBinderListProvider() {
-        MockMeterRegistryFactory sut = new MockMeterRegistryFactory();
-        assertThat(sut.meterBinderListProvider, instanceOf(DefaultMeterBinderListProvider.class));
-    }
-
-    @Test
     public void testAllMeterBindersBindToCreatedRegistry() {
-        MockMeterRegistryFactory sut = new MockMeterRegistryFactory();
-
         MockMeterBinderListProvider meterBinderListProvider = new MockMeterBinderListProvider();
         sut.setMeterBinderListProvider(meterBinderListProvider);
 
@@ -58,8 +56,16 @@ public class MeterRegistryFactoryTest {
     }
 
     @Test
+    public void testThrowsExceptionIfMeterBinderListProviderIsNotSet() {
+        sut.setMeterBinderListProvider(null);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, sut::createObject);
+
+        assertThat(exception.getMessage(), is("MeterBinderListProvider is not set."));
+    }
+
+    @Test
     public void testCommonTags() {
-        MockMeterRegistryFactory sut = new MockMeterRegistryFactory();
         Map<String, String> tags = new HashMap<>();
         tags.put("hello", "HELLO");
         tags.put("world", "WORLD");

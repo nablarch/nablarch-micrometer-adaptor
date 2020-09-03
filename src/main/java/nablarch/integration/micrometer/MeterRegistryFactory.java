@@ -32,7 +32,7 @@ public abstract class MeterRegistryFactory<T extends MeterRegistry> implements C
     /**
      * 生成した{@link MeterRegistry}に適用する{@link io.micrometer.core.instrument.binder.MeterBinder MeterBinder}リストのプロバイダ。
      */
-    protected MeterBinderListProvider meterBinderListProvider = new DefaultMeterBinderListProvider();
+    protected MeterBinderListProvider meterBinderListProvider;
 
     /**
      * すべてのメトリクスに共通で設定するタグ。
@@ -40,6 +40,10 @@ public abstract class MeterRegistryFactory<T extends MeterRegistry> implements C
     protected Map<String, String> tags = Collections.emptyMap();
 
     protected T doCreateObject() {
+        if (meterBinderListProvider == null) {
+            throw new IllegalStateException("MeterBinderListProvider is not set.");
+        }
+
         MicrometerConfiguration configuration = createMicrometerConfiguration();
         T meterRegistry = createMeterRegistry(configuration);
 
