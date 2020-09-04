@@ -7,6 +7,8 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import nablarch.core.repository.di.ComponentDefinitionLoader;
 import nablarch.core.repository.di.DiContainer;
 import nablarch.core.repository.di.config.xml.XmlComponentDefinitionLoader;
+import nablarch.core.repository.disposal.ApplicationDisposer;
+import nablarch.core.repository.disposal.Disposable;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,10 +24,12 @@ import static org.junit.Assert.assertThrows;
  */
 public class MeterRegistryFactoryTest {
     private MockMeterRegistryFactory sut = new MockMeterRegistryFactory();
+    private MockApplicationDisposer applicationDisposer = new MockApplicationDisposer();
 
     @Before
     public void setUp() {
         sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
+        sut.setApplicationDisposer(applicationDisposer);
     }
 
     @Test
@@ -87,6 +91,27 @@ public class MeterRegistryFactoryTest {
         assertThat(container.getComponentByType(BarRegistry.class), notNullValue());
     }
 
+    @Test
+    public void testAddCreatedMeterRegistryToApplicationDisposer() throws Exception {
+        SimpleMeterRegistry registry = sut.doCreateObject();
+
+        assertThat(applicationDisposer.disposableList, hasSize(1));
+
+        Disposable disposable = applicationDisposer.disposableList.get(0);
+        disposable.dispose();
+
+        assertThat(registry.isClosed(), is(true));
+    }
+
+    @Test
+    public void testThrowsExceptionIfApplicationDisposerIsNotSet() {
+        sut.setApplicationDisposer(null);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, sut::doCreateObject);
+
+        assertThat(exception.getMessage(), is("ApplicationDisposer is not set."));
+    }
+
     private static class MockMeterRegistryFactory extends MeterRegistryFactory<SimpleMeterRegistry> {
         private MicrometerConfiguration micrometerConfiguration;
         private SimpleMeterRegistry registry = new SimpleMeterRegistry();
@@ -113,6 +138,17 @@ public class MeterRegistryFactoryTest {
                 boundMeterRegistries::add,
                 boundMeterRegistries::add
             );
+        }
+    }
+
+    public static class MockApplicationDisposer implements ApplicationDisposer {
+        private List<Disposable> disposableList = new ArrayList<>();
+
+        @Override public void dispose() {/*noop*/}
+
+        @Override
+        public void addDisposable(Disposable disposable) {
+            disposableList.add(disposable);
         }
     }
 

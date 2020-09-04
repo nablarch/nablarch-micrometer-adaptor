@@ -4,6 +4,7 @@ import io.micrometer.cloudwatch2.CloudWatchMeterRegistry;
 import mockit.Deencapsulation;
 import mockit.Mocked;
 import mockit.Verifications;
+import nablarch.core.repository.disposal.BasicApplicationDisposer;
 import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +26,7 @@ public class CloudWatchMeterRegistryFactoryTest {
 
     @Before
     public void setup() {
+        sut.setApplicationDisposer(new BasicApplicationDisposer());
         sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
         sut.setPrefix("test.cloudwatch");
         sut.setXmlConfigPath("nablarch/integration/micrometer/cloudwatch/CloudWatchMeterRegistryFactoryTest/test.xml");

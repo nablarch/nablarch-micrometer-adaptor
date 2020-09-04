@@ -2,8 +2,8 @@ package nablarch.integration.micrometer.statsd;
 
 import io.micrometer.statsd.StatsdMeterRegistry;
 import mockit.Deencapsulation;
+import nablarch.core.repository.disposal.BasicApplicationDisposer;
 import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
-import nablarch.integration.micrometer.MicrometerConfiguration;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,6 +18,7 @@ public class StatsdMeterRegistryFactoryTest {
     @Test
     public void testCreateObject() {
         StatsdMeterRegistryFactory sut = new StatsdMeterRegistryFactory();
+        sut.setApplicationDisposer(new BasicApplicationDisposer());
         sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
         sut.setPrefix("test.statsd");
         sut.setXmlConfigPath("nablarch/integration/micrometer/statsd/StatsdMeterRegistryFactory/testCreateObject/test.xml");

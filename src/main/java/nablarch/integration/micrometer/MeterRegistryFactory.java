@@ -3,6 +3,7 @@ package nablarch.integration.micrometer;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import nablarch.core.repository.di.ComponentFactory;
+import nablarch.core.repository.disposal.ApplicationDisposer;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,9 +40,17 @@ public abstract class MeterRegistryFactory<T extends MeterRegistry> implements C
      */
     protected Map<String, String> tags = Collections.emptyMap();
 
+    /**
+     * 廃棄処理を行うインタフェース。
+     */
+    protected ApplicationDisposer applicationDisposer;
+
     protected T doCreateObject() {
         if (meterBinderListProvider == null) {
             throw new IllegalStateException("MeterBinderListProvider is not set.");
+        }
+        if (applicationDisposer == null) {
+            throw new IllegalStateException("ApplicationDisposer is not set.");
         }
 
         MicrometerConfiguration configuration = createMicrometerConfiguration();
@@ -49,6 +58,8 @@ public abstract class MeterRegistryFactory<T extends MeterRegistry> implements C
 
         setupCommonTags(meterRegistry);
         meterBinderListProvider.provide().forEach(meterBinder -> meterBinder.bindTo(meterRegistry));
+
+        applicationDisposer.addDisposable(meterRegistry::close);
 
         return meterRegistry;
     }
@@ -107,5 +118,13 @@ public abstract class MeterRegistryFactory<T extends MeterRegistry> implements C
      */
     public void setTags(Map<String, String> tags) {
         this.tags = tags;
+    }
+
+    /**
+     * {@link ApplicationDisposer}を設定する。
+     * @param applicationDisposer {@link ApplicationDisposer}
+     */
+    public void setApplicationDisposer(ApplicationDisposer applicationDisposer) {
+        this.applicationDisposer = applicationDisposer;
     }
 }

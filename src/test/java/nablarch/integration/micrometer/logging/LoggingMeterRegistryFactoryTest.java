@@ -2,6 +2,7 @@ package nablarch.integration.micrometer.logging;
 
 import io.micrometer.core.instrument.logging.LoggingMeterRegistry;
 import mockit.Deencapsulation;
+import nablarch.core.repository.disposal.BasicApplicationDisposer;
 import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
 import org.junit.Test;
 
@@ -17,6 +18,7 @@ public class LoggingMeterRegistryFactoryTest {
     @Test
     public void testCreateObject() {
         LoggingMeterRegistryFactory sut = new LoggingMeterRegistryFactory();
+        sut.setApplicationDisposer(new BasicApplicationDisposer());
         sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
         sut.setPrefix("test.logging");
         sut.setXmlConfigPath("nablarch/integration/micrometer/logging/LoggingMeterRegistryFactory/testCreateObject/test.xml");

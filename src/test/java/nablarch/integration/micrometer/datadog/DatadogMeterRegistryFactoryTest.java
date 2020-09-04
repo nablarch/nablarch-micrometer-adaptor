@@ -2,6 +2,7 @@ package nablarch.integration.micrometer.datadog;
 
 import io.micrometer.datadog.DatadogMeterRegistry;
 import mockit.Deencapsulation;
+import nablarch.core.repository.disposal.BasicApplicationDisposer;
 import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
 import org.junit.Test;
 
@@ -17,6 +18,7 @@ public class DatadogMeterRegistryFactoryTest {
     @Test
     public void testCreateObject() {
         DatadogMeterRegistryFactory sut = new DatadogMeterRegistryFactory();
+        sut.setApplicationDisposer(new BasicApplicationDisposer());
         sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
         sut.setPrefix("test.datadog");
         sut.setXmlConfigPath("nablarch/integration/micrometer/datadog/DatadogMeterRegistryFactoryTest/testCreateObject/test.xml");
