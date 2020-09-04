@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-configuration
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://tis.co.jp/nablarch/component-configuration"
+        xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration  https://nablarch.github.io/schema/component-configuration.xsd">
+
+    <component name="meterBinderListProvider" class="nablarch.integration.micrometer.DefaultMeterBinderListProvider" />
+    <component name="disposer" class="nablarch.integration.micrometer.MeterRegistryFactoryTest$MockApplicationDisposer" />
+
+    <component class="nablarch.integration.micrometer.MeterRegistryFactoryTest$FooRegistryFactory">
+        <property name="meterBinderListProvider" ref="meterBinderListProvider" />
+        <property name="applicationDisposer" ref="disposer" />
+    </component>
+
+    <component class="nablarch.integration.micrometer.MeterRegistryFactoryTest$BarRegistryFactory">
+        <property name="meterBinderListProvider" ref="meterBinderListProvider" />
+        <property name="applicationDisposer" ref="disposer" />
+    </component>
+</component-configuration>
