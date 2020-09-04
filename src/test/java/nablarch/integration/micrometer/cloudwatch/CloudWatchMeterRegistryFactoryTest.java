@@ -4,6 +4,7 @@ import io.micrometer.cloudwatch2.CloudWatchMeterRegistry;
 import mockit.Deencapsulation;
 import mockit.Mocked;
 import mockit.Verifications;
+import nablarch.core.repository.disposal.ApplicationDisposer;
 import nablarch.core.repository.disposal.BasicApplicationDisposer;
 import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
 import org.junit.Before;
@@ -23,10 +24,11 @@ public class CloudWatchMeterRegistryFactoryTest {
     private CloudWatchAsyncClient cloudWatchAsyncClient;
 
     private CloudWatchMeterRegistryFactory sut = new CloudWatchMeterRegistryFactory();
+    private ApplicationDisposer applicationDisposer = new BasicApplicationDisposer();
 
     @Before
     public void setup() {
-        sut.setApplicationDisposer(new BasicApplicationDisposer());
+        sut.setApplicationDisposer(applicationDisposer);
         sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
         sut.setPrefix("test.cloudwatch");
         sut.setXmlConfigPath("nablarch/integration/micrometer/cloudwatch/CloudWatchMeterRegistryFactoryTest/test.xml");
@@ -55,6 +57,16 @@ public class CloudWatchMeterRegistryFactoryTest {
 
         new Verifications() {{
             CloudWatchAsyncClient.create(); times = 0;
+        }};
+    }
+
+    @Test
+    public void testDisposeCloudWatchAsyncClient() {
+        sut.createObject();
+        applicationDisposer.dispose();
+
+        new Verifications() {{
+            cloudWatchAsyncClient.close(); times = 1;
         }};
     }
 }

@@ -22,7 +22,11 @@ public class CloudWatchMeterRegistryFactory extends MeterRegistryFactory<CloudWa
     @Override
     protected CloudWatchMeterRegistry createMeterRegistry(MicrometerConfiguration micrometerConfiguration) {
         NablarchCloudWatchConfig cloudWatchConfig = new NablarchCloudWatchConfig(prefix, micrometerConfiguration);
-        return new CloudWatchMeterRegistry(cloudWatchConfig, Clock.SYSTEM, cloudWatchAsyncClientProvider.provide());
+
+        CloudWatchAsyncClient client = cloudWatchAsyncClientProvider.provide();
+        applicationDisposer.addDisposable(client::close);
+
+        return new CloudWatchMeterRegistry(cloudWatchConfig, Clock.SYSTEM, client);
     }
 
     /**
