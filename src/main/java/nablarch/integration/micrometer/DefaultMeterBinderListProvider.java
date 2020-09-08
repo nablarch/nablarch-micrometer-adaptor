@@ -8,9 +8,9 @@ import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
-import io.micrometer.shaded.reactor.core.Disposable;
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
+import nablarch.core.repository.disposal.Disposable;
 import nablarch.integration.micrometer.instrument.binder.jvm.NablarchGcCountMetrics;
 
 import java.util.Arrays;
