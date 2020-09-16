@@ -46,9 +46,10 @@ public class HttpRequestMetricsHandlerTest {
         new Expectations() {{
             context.handleNext(request); result = response;
             context.getServletResponse(); result = httpServletResponse;
+            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_CLASS_VAR_NAME); result = "foo.bar.TestController";
+            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_METHOD_VAR_NAME); result = "hello";
 
             request.getMethod(); result = "GET";
-            request.getRequestPath(); result = "/foo/bar";
             httpServletResponse.getStatus(); result = 200;
         }};
     }
@@ -71,8 +72,9 @@ public class HttpRequestMetricsHandlerTest {
         Timer timer = registry.get("http.server.requests").timer();
         Meter.Id id = timer.getId();
 
-        assertThat(id.getTag("method"), is("GET"));
-        assertThat(id.getTag("path"), is("/foo/bar"));
+        assertThat(id.getTag("class"), is("foo.bar.TestController"));
+        assertThat(id.getTag("method"), is("hello"));
+        assertThat(id.getTag("httpMethod"), is("GET"));
         assertThat(id.getTag("status"), is("200"));
         assertThat(id.getTag("outcome"), is("SUCCESS"));
         assertThat(id.getTag("exception"), is("None"));
@@ -86,7 +88,8 @@ public class HttpRequestMetricsHandlerTest {
             context.getServletResponse(); result = httpServletResponse;
 
             request.getMethod(); result = "POST";
-            request.getRequestPath(); result = "/fizz/buzz";
+            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_CLASS_VAR_NAME); result = "foo.bar.TestErrorController";
+            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_METHOD_VAR_NAME); result = "throwError";
             httpServletResponse.getStatus(); result = 500;
         }};
 
@@ -96,8 +99,9 @@ public class HttpRequestMetricsHandlerTest {
         Timer timer = registry.get("http.server.requests").timer();
         Meter.Id id = timer.getId();
 
-        assertThat(id.getTag("method"), is("POST"));
-        assertThat(id.getTag("path"), is("/fizz/buzz"));
+        assertThat(id.getTag("class"), is("foo.bar.TestErrorController"));
+        assertThat(id.getTag("method"), is("throwError"));
+        assertThat(id.getTag("httpMethod"), is("POST"));
         assertThat(id.getTag("status"), is("500"));
         assertThat(id.getTag("outcome"), is("SERVER_ERROR"));
         assertThat(id.getTag("exception"), is("Throwable"));
@@ -112,7 +116,8 @@ public class HttpRequestMetricsHandlerTest {
             context.getException(); returns(new NullPointerException("test null"), null);
 
             request.getMethod(); result = "PUT";
-            request.getRequestPath(); result = "/test";
+            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_CLASS_VAR_NAME); result = "foo.bar.TestController";
+            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_METHOD_VAR_NAME); result = "error";
             httpServletResponse.getStatus(); result = 500;
         }};
 
@@ -121,12 +126,55 @@ public class HttpRequestMetricsHandlerTest {
         Timer timer = registry.get("http.server.requests").timer();
         Meter.Id id = timer.getId();
 
-        assertThat(id.getTag("method"), is("PUT"));
-        assertThat(id.getTag("path"), is("/test"));
+        assertThat(id.getTag("class"), is("foo.bar.TestController"));
+        assertThat(id.getTag("method"), is("error"));
+        assertThat(id.getTag("httpMethod"), is("PUT"));
         assertThat(id.getTag("status"), is("500"));
         assertThat(id.getTag("outcome"), is("SERVER_ERROR"));
         assertThat(id.getTag("exception"), is("NullPointerException"));
         assertThat(timer.count(), is(1L));
+    }
+
+    @Test
+    public void testClassAndMethodIsUnknown() {
+        new Expectations() {{
+            context.handleNext(request); result = response;
+            context.getServletResponse(); result = httpServletResponse;
+
+            request.getMethod(); result = "GET";
+            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_CLASS_VAR_NAME); result = null;
+            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_METHOD_VAR_NAME); result = null;
+        }};
+
+        sut.handle(request, context);
+
+        Timer timer = registry.get("http.server.requests").timer();
+        Meter.Id id = timer.getId();
+
+        assertThat(id.getTag("class"), is("UNKNOWN"));
+        assertThat(id.getTag("method"), is("UNKNOWN"));
+    }
+
+    @Test
+    public void testChangeControllerAndActionVarNames() {
+        new Expectations() {{
+            context.handleNext(request); result = response;
+            context.getServletResponse(); result = httpServletResponse;
+
+            request.getMethod(); result = "GET";
+            context.getRequestScopedVar("test_class_name"); result = "foo.bar.TestAction";
+            context.getRequestScopedVar("test_method_name"); result = "execute";
+        }};
+
+        sut.setRequestMappingClassVarName("test_class_name");
+        sut.setRequestMappingMethodVarName("test_method_name");
+        sut.handle(request, context);
+
+        Timer timer = registry.get("http.server.requests").timer();
+        Meter.Id id = timer.getId();
+
+        assertThat(id.getTag("class"), is("foo.bar.TestAction"));
+        assertThat(id.getTag("method"), is("execute"));
     }
 
     @Test

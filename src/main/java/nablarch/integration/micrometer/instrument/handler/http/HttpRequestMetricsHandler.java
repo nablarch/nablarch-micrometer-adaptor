@@ -21,11 +21,15 @@ import javax.servlet.http.HttpServletResponse;
  *     <th>説明</th>
  *   </tr>
  *   <tr>
- *     <td>path</td>
- *     <td>リクエストされたパス（クエリストリングを除く）</td>
+ *     <td>class</td>
+ *     <td>リクエストを処理したクラスの名前（取得できない場合は {@code UNKNOWN}）</td>
  *   </tr>
  *   <tr>
  *     <td>method</td>
+ *     <td>リクエストを処理したメソッドの名前（取得できない場合は {@code UNKNOWN}）</td>
+ *   </tr>
+ *   <tr>
+ *     <td>httpMethod</td>
  *     <td>HTTPメソッド</td>
  *   </tr>
  *   <tr>
@@ -50,8 +54,19 @@ import javax.servlet.http.HttpServletResponse;
  * @author Tanaka Tomoyuki
  */
 public class HttpRequestMetricsHandler implements HttpRequestHandler {
+    /**
+     * アクションクラス名をリクエストスコープから取得するときのデフォルトのキー。
+     */
+    static final String DEFAULT_REQUEST_MAPPING_CLASS_VAR_NAME = "nablarch_request_mapping_class";
+    /**
+     * アクションクラスのメソッド名をリクエストスコープから取得するときのデフォルトのキー。
+     */
+    static final String DEFAULT_REQUEST_MAPPING_METHOD_VAR_NAME = "nablarch_request_mapping_method";
 
     private MeterRegistry meterRegistry;
+
+    private String requestMappingClassVarName = DEFAULT_REQUEST_MAPPING_CLASS_VAR_NAME;
+    private String requestMappingMethodVarName = DEFAULT_REQUEST_MAPPING_METHOD_VAR_NAME;
 
     @Override
     public HttpResponse handle(HttpRequest request, ExecutionContext context) {
@@ -77,9 +92,13 @@ public class HttpRequestMetricsHandler implements HttpRequestHandler {
         HttpServletResponse servletResponse = ((ServletExecutionContext) context).getServletResponse();
         Throwable throwable = cachedThrowable != null ? cachedThrowable : context.getException();
 
+        String className = context.getRequestScopedVar(requestMappingClassVarName);
+        String methodName = context.getRequestScopedVar(requestMappingMethodVarName);
+
         return Timer.builder("http.server.requests")
-                .tag("method", request.getMethod())
-                .tag("path", request.getRequestPath())
+                .tag("class", className != null ? className : "UNKNOWN")
+                .tag("method", methodName != null ? methodName : "UNKNOWN")
+                .tag("httpMethod", request.getMethod())
                 .tag("status", String.valueOf(servletResponse.getStatus()))
                 .tag("outcome", resolveOutcome(servletResponse.getStatus()))
                 .tag("exception", throwable == null ? "None" : throwable.getClass().getSimpleName())
@@ -110,4 +129,19 @@ public class HttpRequestMetricsHandler implements HttpRequestHandler {
         this.meterRegistry = meterRegistry;
     }
 
+    /**
+     * アクションクラス名をリクエストスコープから取得するときのキーを指定する。
+     * @param requestMappingClassVarName アクションクラス名のキー
+     */
+    public void setRequestMappingClassVarName(String requestMappingClassVarName) {
+        this.requestMappingClassVarName = requestMappingClassVarName;
+    }
+
+    /**
+     * アクションクラスのメソッド名をリクエストスコープから取得するときのキーを指定する。
+     * @param requestMappingMethodVarName アクションクラスのメソッド名のキー
+     */
+    public void setRequestMappingMethodVarName(String requestMappingMethodVarName) {
+        this.requestMappingMethodVarName = requestMappingMethodVarName;
+    }
 }

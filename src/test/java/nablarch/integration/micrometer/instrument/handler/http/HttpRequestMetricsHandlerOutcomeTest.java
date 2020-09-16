@@ -68,8 +68,9 @@ public class HttpRequestMetricsHandlerOutcomeTest {
             context.handleNext(request); result = response;
             context.getServletResponse(); result = httpServletResponse;
 
+            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_CLASS_VAR_NAME); result = "foo.bar.TestController";
+            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_METHOD_VAR_NAME); result = "test";
             request.getMethod(); result = "PUT";
-            request.getRequestPath(); result = "/test/path";
             httpServletResponse.getStatus(); result = fixture.statusCode;
         }};
 
