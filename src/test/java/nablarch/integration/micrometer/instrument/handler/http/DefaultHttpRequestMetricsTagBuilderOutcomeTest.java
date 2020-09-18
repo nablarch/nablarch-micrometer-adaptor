@@ -1,11 +1,9 @@
 package nablarch.integration.micrometer.instrument.handler.http;
 
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import mockit.Expectations;
 import mockit.Mocked;
 import nablarch.fw.web.HttpRequest;
-import nablarch.fw.web.HttpResponse;
 import nablarch.fw.web.servlet.ServletExecutionContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,14 +14,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.hasItem;
 
 /**
- * {@link HttpRequestMetricsHandler}の outcome タグのパターンをテストするクラス。
+ * {@link DefaultHttpRequestMetricsTagBuilder}の outcome タグのパターンをテストするクラス。
  * @author Tanaka Tomoyuki
  */
 @RunWith(Parameterized.class)
-public class HttpRequestMetricsHandlerOutcomeTest {
+public class DefaultHttpRequestMetricsTagBuilderOutcomeTest {
     @Parameterized.Parameters
     public static List<Fixture> parameters() {
         return Arrays.asList(
@@ -45,39 +43,31 @@ public class HttpRequestMetricsHandlerOutcomeTest {
     @Mocked
     private HttpRequest request;
     @Mocked
-    private HttpResponse response;
-    @Mocked
     private HttpServletResponse httpServletResponse;
     @Mocked
     private ServletExecutionContext context;
 
     private final Fixture fixture;
 
-    public HttpRequestMetricsHandlerOutcomeTest(Fixture fixture) {
+    public DefaultHttpRequestMetricsTagBuilderOutcomeTest(Fixture fixture) {
         this.fixture = fixture;
     }
 
     @Test
     public void test() {
-        HttpRequestMetricsHandler sut = new HttpRequestMetricsHandler();
-
-        SimpleMeterRegistry registry = new SimpleMeterRegistry();
-        sut.setMeterRegistry(registry);
+        DefaultHttpRequestMetricsTagBuilder sut = new DefaultHttpRequestMetricsTagBuilder();
 
         new Expectations() {{
-            context.handleNext(request); result = response;
             context.getServletResponse(); result = httpServletResponse;
 
-            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_CLASS_VAR_NAME); result = "foo.bar.TestController";
-            context.getRequestScopedVar(HttpRequestMetricsHandler.DEFAULT_REQUEST_MAPPING_METHOD_VAR_NAME); result = "test";
+            context.getRequestScopedVar(DefaultHttpRequestMetricsTagBuilder.DEFAULT_REQUEST_MAPPING_CLASS_VAR_NAME); result = "foo.bar.TestController";
+            context.getRequestScopedVar(DefaultHttpRequestMetricsTagBuilder.DEFAULT_REQUEST_MAPPING_METHOD_VAR_NAME); result = "test";
             request.getMethod(); result = "PUT";
             httpServletResponse.getStatus(); result = fixture.statusCode;
         }};
 
-        sut.handle(request, context);
-
-        Meter.Id id = registry.get("http.server.requests").timer().getId();
-        assertThat("statusCode=" + fixture.statusCode, id.getTag("outcome"), is(fixture.expectedOutcome));
+        List<Tag> tagList = sut.build(request, context, null);
+        assertThat("statusCode=" + fixture.statusCode, tagList, hasItem(Tag.of("outcome", fixture.expectedOutcome)));
     }
 
     private static Fixture fixture(int statusCode, String expectedOutcome) {
