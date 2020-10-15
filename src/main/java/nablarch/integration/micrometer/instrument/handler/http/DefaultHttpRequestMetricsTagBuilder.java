@@ -118,8 +118,8 @@ public class DefaultHttpRequestMetricsTagBuilder implements HttpRequestMetricsTa
         }
     }
 
-    private String resolveException(ExecutionContext context, Throwable cachedThrowable) {
-        Throwable throwable = cachedThrowable != null ? cachedThrowable : context.getException();
+    private String resolveException(ExecutionContext context, Throwable thrownThrowable) {
+        Throwable throwable = thrownThrowable != null ? thrownThrowable : context.getException();
         return throwable == null ? "None" : throwable.getClass().getSimpleName();
     }
 }
