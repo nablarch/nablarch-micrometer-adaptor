@@ -8,7 +8,6 @@ import nablarch.fw.web.servlet.ServletExecutionContext;
 
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -96,8 +95,8 @@ public class DefaultHttpRequestMetricsTagBuilder implements HttpRequestMetricsTa
     private String buildMethodTag(Method method) {
         StringBuilder sb = new StringBuilder(method.getName());
 
-        for (Parameter parameter : method.getParameters()) {
-            sb.append("_").append(parameter.getType().getCanonicalName());
+        for (Class<?> parameterType : method.getParameterTypes()) {
+            sb.append("_").append(parameterType.getCanonicalName());
         }
 
         return sb.toString();
