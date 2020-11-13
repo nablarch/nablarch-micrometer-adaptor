@@ -1,10 +1,11 @@
-package nablarch.integration.micrometer.instrument.handler.http;
+package nablarch.integration.micrometer.instrument.http;
 
 import io.micrometer.core.instrument.Tag;
 import nablarch.fw.ExecutionContext;
 import nablarch.fw.handler.MethodBinding;
 import nablarch.fw.web.HttpRequest;
 import nablarch.fw.web.servlet.ServletExecutionContext;
+import nablarch.integration.micrometer.instrument.handler.HandlerMetricsMetaDataBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -12,9 +13,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * {@link HttpRequestMetricsTagBuilder}のデフォルト実装。
+ * HTTPリクエストの処理時間のメトリクスに設定するメタ情報を構築するビルダー。
  * <p>
- * タグのリストは以下の内容で作成する。
+ * メトリクスの名前は{@code "http.server.requests"}を返す。
+ * </p>
+ * <p>
+ * また、タグのリストは以下の内容で作成する。
  * <table>
  *   <tr>
  *     <th>タグ</th>
@@ -58,11 +62,21 @@ import java.util.List;
  *   </tr>
  * </table>
  * </p>
+ * @author Tanaka Tomoyuki
  */
-public class DefaultHttpRequestMetricsTagBuilder implements HttpRequestMetricsTagBuilder {
+public class HttpRequestTimeMetricsMetaDataBuilder implements HandlerMetricsMetaDataBuilder<HttpRequest, Object> {
+    @Override
+    public String getMetricsName() {
+        return "http.server.requests";
+    }
 
     @Override
-    public List<Tag> build(HttpRequest request, ExecutionContext context, Throwable thrownThrowable) {
+    public String getMetricsDescription() {
+        return "HTTP request metrics measured by Timer.";
+    }
+
+    @Override
+    public List<Tag> buildTagList(HttpRequest request, ExecutionContext context, Object result, Throwable thrownThrowable) {
         Class<?> clazz = context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS);
         Method method = context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD);
         HttpServletResponse servletResponse = ((ServletExecutionContext) context).getServletResponse();
