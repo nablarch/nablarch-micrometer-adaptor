@@ -6,7 +6,7 @@ import io.micrometer.core.instrument.Tag;
  * バッチのリクエストパスからアクションクラスの情報をタグとして取り出すためのユーティリティ。
  * @author Tanaka Tomoyuki
  */
-public class BatchActionClassTagUtil {
+public final class BatchActionClassTagUtil {
 
     /**
      * リクエストパスからバッチアクションクラスの名前を取得して {@link Tag} で返す。
