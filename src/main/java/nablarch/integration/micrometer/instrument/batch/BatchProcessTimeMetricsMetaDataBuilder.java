@@ -25,15 +25,18 @@ import java.util.Objects;
  * @author Tanaka Tomoyuki
  */
 public class BatchProcessTimeMetricsMetaDataBuilder implements HandlerMetricsMetaDataBuilder<CommandLine, Object> {
-    @Override
-    public String getMetricsName() {
-        return "batch.process.time";
-    }
+    /**
+     * デフォルトのメトリクス名。
+     */
+    static final String DEFAULT_METRICS_NAME = "batch.process.time";
 
-    @Override
-    public String getMetricsDescription() {
-        return "Batch process time.";
-    }
+    /**
+     * デフォルトのメトリクスの説明。
+     */
+    static final String DEFAULT_METRICS_DESCRIPTION = "Batch process time.";
+
+    private String metricsName = DEFAULT_METRICS_NAME;
+    private String metricsDescription = DEFAULT_METRICS_DESCRIPTION;
 
     @Override
     public List<Tag> buildTagList(CommandLine commandLine, ExecutionContext executionContext, Object result, Throwable thrownThrowable) {
@@ -41,5 +44,31 @@ public class BatchProcessTimeMetricsMetaDataBuilder implements HandlerMetricsMet
             BatchActionClassTagUtil.obtain(commandLine.getRequestPath()),
             Tag.of("status", Objects.toString(result, "None"))
         );
+    }
+
+    @Override
+    public String getMetricsName() {
+        return metricsName;
+    }
+
+    @Override
+    public String getMetricsDescription() {
+        return metricsDescription;
+    }
+
+    /**
+     * メトリクス名を設定する。
+     * @param metricsName メトリクス名
+     */
+    public void setMetricsName(String metricsName) {
+        this.metricsName = metricsName;
+    }
+
+    /**
+     * メトリクスの説明を設定する。
+     * @param metricsDescription メトリクスの説明
+     */
+    public void setMetricsDescription(String metricsDescription) {
+        this.metricsDescription = metricsDescription;
     }
 }

@@ -5,7 +5,6 @@ import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleConfig;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import nablarch.core.ThreadContext;
-import nablarch.integration.micrometer.instrument.batch.BatchTransactionTimeMetricsLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * {@link BatchTransactionTimeMetricsLogger}の単体テスト。
@@ -24,6 +24,7 @@ import static org.hamcrest.Matchers.is;
 public class BatchTransactionTimeMetricsLoggerTest {
     private BatchTransactionTimeMetricsLogger sut = new BatchTransactionTimeMetricsLogger();
     private String originalRequestId;
+
     @Before
     public void setup() {
         originalRequestId = ThreadContext.getRequestId();
@@ -53,8 +54,9 @@ public class BatchTransactionTimeMetricsLoggerTest {
 
         sut.initialize();
         sut.increment(0L);
-        Timer timer = meterRegistry.find("batch.transaction.time").timer();
+        Timer timer = meterRegistry.find(BatchTransactionTimeMetricsLogger.DEFAULT_METRICS_NAME).timer();
         assertThat(timer.getId().getTag("class"), is("TestBatchAction"));
+        assertThat(timer.getId().getDescription(), is(BatchTransactionTimeMetricsLogger.DEFAULT_METRICS_DESCRIPTION));
 
         assertThat(timer.count(), is(1L));
         assertThat(timer.totalTime(TimeUnit.NANOSECONDS), is(1500.0));
@@ -62,6 +64,34 @@ public class BatchTransactionTimeMetricsLoggerTest {
         sut.increment(0L);
         assertThat(timer.count(), is(2L));
         assertThat(timer.totalTime(TimeUnit.NANOSECONDS), is(2000.0));
+    }
+
+    @Test
+    public void testSetMetricsName() {
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        sut.setMeterRegistry(meterRegistry);
+
+        sut.setMetricsName("test.metrics");
+
+        sut.initialize();
+        sut.increment(0L);
+
+        Timer timer = meterRegistry.find("test.metrics").timer();
+        assertThat(timer, is(notNullValue()));
+    }
+
+    @Test
+    public void testSetMetricsDescription() {
+        SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
+        sut.setMeterRegistry(meterRegistry);
+
+        sut.setMetricsDescription("Test metrics.");
+
+        sut.initialize();
+        sut.increment(0L);
+
+        Timer timer = meterRegistry.find(BatchTransactionTimeMetricsLogger.DEFAULT_METRICS_NAME).timer();
+        assertThat(timer.getId().getDescription(), is("Test metrics."));
     }
 
     @After

@@ -18,7 +18,20 @@ import java.util.Collections;
  */
 public class BatchTransactionTimeMetricsLogger implements CommitLogger {
     private static final String THREAD_CONTEXT_KEY_TIMER_SAMPLE = "nablarch_transaction_timer_sample";
+
+    /**
+     * デフォルトのメトリクス名。
+     */
+    static final String DEFAULT_METRICS_NAME = "batch.transaction.time";
+
+    /**
+     * デフォルトのメトリクスの説明。
+     */
+    static final String DEFAULT_METRICS_DESCRIPTION = "Batch transaction time.";
+
     private MeterRegistry meterRegistry;
+    private String metricsName = DEFAULT_METRICS_NAME;
+    private String metricsDescription = DEFAULT_METRICS_DESCRIPTION;
 
     @Override
     public void initialize() {
@@ -29,8 +42,8 @@ public class BatchTransactionTimeMetricsLogger implements CommitLogger {
     public void increment(long count) {
         Timer.Sample sample = (Timer.Sample)ThreadContext.getObject(THREAD_CONTEXT_KEY_TIMER_SAMPLE);
         Tag batchClass = BatchActionClassTagUtil.obtain(ThreadContext.getRequestId());
-        sample.stop(meterRegistry, Timer.builder("batch.transaction.time")
-                .description("Batch transaction time.")
+        sample.stop(meterRegistry, Timer.builder(metricsName)
+                .description(metricsDescription)
                 .tags(Collections.singleton(batchClass)));
 
         beginTimer();
@@ -52,5 +65,21 @@ public class BatchTransactionTimeMetricsLogger implements CommitLogger {
      */
     public void setMeterRegistry(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
+    }
+
+    /**
+     * メトリクスの名前を設定する。
+     * @param metricsName メトリクスの名前
+     */
+    public void setMetricsName(String metricsName) {
+        this.metricsName = metricsName;
+    }
+
+    /**
+     * メトリクスの説明を設定する。
+     * @param metricsDescription メトリクスの説明
+     */
+    public void setMetricsDescription(String metricsDescription) {
+        this.metricsDescription = metricsDescription;
     }
 }

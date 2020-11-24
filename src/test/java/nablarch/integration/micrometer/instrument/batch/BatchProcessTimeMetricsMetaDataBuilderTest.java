@@ -25,13 +25,25 @@ public class BatchProcessTimeMetricsMetaDataBuilderTest {
     private ExecutionContext context = new ExecutionContext();
 
     @Test
-    public void testGetMetricsName() {
-        assertThat(sut.getMetricsName(), is("batch.process.time"));
+    public void testGetMetricsNameInDefault() {
+        assertThat(sut.getMetricsName(), is(BatchProcessTimeMetricsMetaDataBuilder.DEFAULT_METRICS_NAME));
     }
 
     @Test
-    public void testGetMetricsDescription() {
-        assertThat(sut.getMetricsDescription(), is("Batch process time."));
+    public void testGetMetricsDescriptionInDefault() {
+        assertThat(sut.getMetricsDescription(), is(BatchProcessTimeMetricsMetaDataBuilder.DEFAULT_METRICS_DESCRIPTION));
+    }
+
+    @Test
+    public void testSetMetricsName() {
+        sut.setMetricsName("test.metrics");
+        assertThat(sut.getMetricsName(), is("test.metrics"));
+    }
+
+    @Test
+    public void testSetMetricsDescription() {
+        sut.setMetricsDescription("Test metrics.");
+        assertThat(sut.getMetricsDescription(), is("Test metrics."));
     }
 
     @Test

@@ -19,8 +19,19 @@ import java.util.List;
  * @author Tanaka Tomoyuki
  */
 public class NablarchGcCountMetrics implements MeterBinder {
+    /**
+     * デフォルトのメトリクス名。
+     */
+    static final String DEFAULT_METRICS_NAME = "jvm.gc.count";
+
+    /**
+     * デフォルトのメトリクスの説明。
+     */
+    static final String DEFAULT_METRICS_DESCRIPTION = "Count of garbage collection";
 
     private final Iterable<Tag> tags;
+    private final String metricsName;
+    private final String metricsDescription;
 
     /**
      * コンストラクタ。
@@ -30,10 +41,31 @@ public class NablarchGcCountMetrics implements MeterBinder {
     }
 
     /**
+     * メトリクス名と説明を設定するコンストラクタ。
+     * @param metricsName メトリクス名
+     * @param metricsDescription メトリクスの説明
+     */
+    public NablarchGcCountMetrics(String metricsName, String metricsDescription) {
+        this(metricsName, metricsDescription, Collections.emptyList());
+    }
+
+    /**
      * 追加のタグを指定するコンストラクタ。
      * @param tags 追加で指定するタグ
      */
     public NablarchGcCountMetrics(Iterable<Tag> tags) {
+        this(DEFAULT_METRICS_NAME, DEFAULT_METRICS_DESCRIPTION, tags);
+    }
+
+    /**
+     * メトリクス名と説明、追加のタグを指定するコンストラクタ。
+     * @param metricsName メトリクス名
+     * @param metricsDescription メトリクスの説明
+     * @param tags 追加で指定するタグ
+     */
+    public NablarchGcCountMetrics(String metricsName, String metricsDescription, Iterable<Tag> tags) {
+        this.metricsName = metricsName;
+        this.metricsDescription = metricsDescription;
         this.tags = tags;
     }
 
@@ -42,10 +74,10 @@ public class NablarchGcCountMetrics implements MeterBinder {
         List<GarbageCollectorMXBean> garbageCollectorMXBeans = ManagementFactory.getGarbageCollectorMXBeans();
 
         for (GarbageCollectorMXBean garbageCollectorMXBean : garbageCollectorMXBeans) {
-            FunctionCounter.builder("jvm.gc.count", garbageCollectorMXBean, GarbageCollectorMXBean::getCollectionCount)
+            FunctionCounter.builder(metricsName, garbageCollectorMXBean, GarbageCollectorMXBean::getCollectionCount)
                     .tag("memory.manager.name", garbageCollectorMXBean.getName())
                     .tags(tags)
-                    .description("Count of garbage collection")
+                    .description(metricsDescription)
                     .register(registry);
         }
     }

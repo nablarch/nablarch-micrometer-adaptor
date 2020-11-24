@@ -27,13 +27,25 @@ public class HttpRequestTimeMetricsMetaDataBuilderTest {
     private HttpRequestTimeMetricsMetaDataBuilder sut = new HttpRequestTimeMetricsMetaDataBuilder();
 
     @Test
-    public void testGetMetricsName() {
-        assertThat(sut.getMetricsName(), is("http.server.requests"));
+    public void testGetMetricsNameInDefault() {
+        assertThat(sut.getMetricsName(), is(HttpRequestTimeMetricsMetaDataBuilder.DEFAULT_METRICS_NAME));
     }
 
     @Test
-    public void testGetMetricsDescription() {
-        assertThat(sut.getMetricsDescription(), is("HTTP request metrics measured by Timer."));
+    public void testGetMetricsDescriptionInDefault() {
+        assertThat(sut.getMetricsDescription(), is(HttpRequestTimeMetricsMetaDataBuilder.DEFAULT_METRICS_DESCRIPTION));
+    }
+
+    @Test
+    public void testSetMetricsName() {
+        sut.setMetricsName("test.metrics");
+        assertThat(sut.getMetricsName(), is("test.metrics"));
+    }
+
+    @Test
+    public void testSetMetricsDescription() {
+        sut.setMetricsDescription("Test description.");
+        assertThat(sut.getMetricsDescription(), is("Test description."));
     }
 
     @Test

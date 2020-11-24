@@ -65,15 +65,18 @@ import java.util.List;
  * @author Tanaka Tomoyuki
  */
 public class HttpRequestTimeMetricsMetaDataBuilder implements HandlerMetricsMetaDataBuilder<HttpRequest, Object> {
-    @Override
-    public String getMetricsName() {
-        return "http.server.requests";
-    }
+    /**
+     * デフォルトのメトリクス名。
+     */
+    static final String DEFAULT_METRICS_NAME = "http.server.requests";
 
-    @Override
-    public String getMetricsDescription() {
-        return "HTTP request metrics measured by Timer.";
-    }
+    /**
+     * デフォルトのメトリクスの説明。
+     */
+    static final String DEFAULT_METRICS_DESCRIPTION = "HTTP request metrics measured by Timer.";
+
+    private String metricsName = DEFAULT_METRICS_NAME;
+    private String metricsDescription = DEFAULT_METRICS_DESCRIPTION;
 
     @Override
     public List<Tag> buildTagList(HttpRequest request, ExecutionContext context, Object result, Throwable thrownThrowable) {
@@ -135,5 +138,31 @@ public class HttpRequestTimeMetricsMetaDataBuilder implements HandlerMetricsMeta
     private String resolveException(ExecutionContext context, Throwable thrownThrowable) {
         Throwable throwable = thrownThrowable != null ? thrownThrowable : context.getException();
         return throwable == null ? "None" : throwable.getClass().getSimpleName();
+    }
+
+    @Override
+    public String getMetricsName() {
+        return metricsName;
+    }
+
+    @Override
+    public String getMetricsDescription() {
+        return metricsDescription;
+    }
+
+    /**
+     * メトリクス名を設定する。
+     * @param metricsName メトリクス名
+     */
+    public void setMetricsName(String metricsName) {
+        this.metricsName = metricsName;
+    }
+
+    /**
+     * メトリクスの説明を設定する。
+     * @param metricsDescription メトリクスの説明
+     */
+    public void setMetricsDescription(String metricsDescription) {
+        this.metricsDescription = metricsDescription;
     }
 }
