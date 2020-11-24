@@ -1,4 +1,4 @@
-package nablarch.integration.micrometer.instrument.handler.http;
+package nablarch.integration.micrometer.instrument.http;
 
 import java.lang.reflect.Method;
 import java.util.List;

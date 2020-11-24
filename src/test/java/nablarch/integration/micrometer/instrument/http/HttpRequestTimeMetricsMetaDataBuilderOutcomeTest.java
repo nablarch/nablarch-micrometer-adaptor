@@ -1,4 +1,4 @@
-package nablarch.integration.micrometer.instrument.handler.http;
+package nablarch.integration.micrometer.instrument.http;
 
 import io.micrometer.core.instrument.Tag;
 import mockit.Expectations;
@@ -18,11 +18,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 
 /**
- * {@link DefaultHttpRequestMetricsTagBuilder}の outcome タグのパターンをテストするクラス。
+ * {@link HttpRequestTimeMetricsMetaDataBuilder}の outcome タグのパターンをテストするクラス。
  * @author Tanaka Tomoyuki
  */
 @RunWith(Parameterized.class)
-public class DefaultHttpRequestMetricsTagBuilderOutcomeTest {
+public class HttpRequestTimeMetricsMetaDataBuilderOutcomeTest {
     @Parameterized.Parameters
     public static List<Fixture> parameters() {
         return Arrays.asList(
@@ -50,13 +50,13 @@ public class DefaultHttpRequestMetricsTagBuilderOutcomeTest {
 
     private final Fixture fixture;
 
-    public DefaultHttpRequestMetricsTagBuilderOutcomeTest(Fixture fixture) {
+    public HttpRequestTimeMetricsMetaDataBuilderOutcomeTest(Fixture fixture) {
         this.fixture = fixture;
     }
 
     @Test
     public void test() {
-        DefaultHttpRequestMetricsTagBuilder sut = new DefaultHttpRequestMetricsTagBuilder();
+        HttpRequestTimeMetricsMetaDataBuilder sut = new HttpRequestTimeMetricsMetaDataBuilder();
 
         new Expectations() {{
             context.getServletResponse(); result = httpServletResponse;
@@ -67,7 +67,7 @@ public class DefaultHttpRequestMetricsTagBuilderOutcomeTest {
             httpServletResponse.getStatus(); result = fixture.statusCode;
         }};
 
-        List<Tag> tagList = sut.build(request, context, null);
+        List<Tag> tagList = sut.buildTagList(request, context, null, null);
         assertThat("statusCode=" + fixture.statusCode, tagList, hasItem(Tag.of("outcome", fixture.expectedOutcome)));
     }
 
