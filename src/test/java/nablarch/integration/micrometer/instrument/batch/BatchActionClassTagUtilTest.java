@@ -26,6 +26,6 @@ public class BatchActionClassTagUtilTest {
     public void testThrowsExceptionIfRequestPathFormatIsIllegal() {
         IllegalArgumentException result = Assert.assertThrows(IllegalArgumentException.class, () -> BatchActionClassTagUtil.obtain("no-slash"));
 
-        assertThat(result.getMessage(), is("illegal requestPath format. requestPath='no-slash'."));
+        assertThat(result.getMessage(), is("Illegal requestPath format. requestPath='no-slash'."));
     }
 }

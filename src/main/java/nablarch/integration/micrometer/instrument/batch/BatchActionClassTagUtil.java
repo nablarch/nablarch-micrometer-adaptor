@@ -16,7 +16,7 @@ public final class BatchActionClassTagUtil {
     public static Tag obtain(String requestPath) {
         String[] tokens = requestPath.split("/");
         if (tokens.length < 2) {
-            throw new IllegalArgumentException("illegal requestPath format. requestPath='" + requestPath + "'.");
+            throw new IllegalArgumentException("Illegal requestPath format. requestPath='" + requestPath + "'.");
         }
         return Tag.of("class", tokens[0]);
     }
