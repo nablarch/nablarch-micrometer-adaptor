@@ -6,7 +6,9 @@ import io.micrometer.core.instrument.Timer;
 import nablarch.fw.ExecutionContext;
 import nablarch.fw.Handler;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * ハンドラキューに追加することで、後続処理の実行時間をメトリクスとして収集するハンドラクラス。
@@ -17,6 +19,12 @@ import java.util.List;
 public class TimerMetricsHandler<TData, TResult> implements Handler<TData, TResult> {
     private MeterRegistry meterRegistry;
     private HandlerMetricsMetaDataBuilder<TData, TResult> handlerMetricsMetaDataBuilder;
+
+    private List<String> percentiles;
+    private boolean enablePercentileHistogram;
+    private List<String> serviceLevelObjectives;
+    private Long minimumExpectedValue;
+    private Long maximumExpectedValue;
 
     @Override
     public TResult handle(TData param, ExecutionContext executionContext) {
@@ -40,12 +48,38 @@ public class TimerMetricsHandler<TData, TResult> implements Handler<TData, TResu
         } finally {
             List<Tag> tagList = handlerMetricsMetaDataBuilder.buildTagList(param, executionContext, result, thrownThrowable);
 
-            Timer timer = Timer.builder(handlerMetricsMetaDataBuilder.getMetricsName())
+            Timer.Builder builder = Timer.builder(handlerMetricsMetaDataBuilder.getMetricsName());
+
+            setupPercentileOptions(builder);
+
+            Timer timer = builder
                     .description(handlerMetricsMetaDataBuilder.getMetricsDescription())
                     .tags(tagList)
                     .register(meterRegistry);
 
             sample.stop(timer);
+        }
+    }
+
+    private void setupPercentileOptions(Timer.Builder builder) {
+        builder.publishPercentileHistogram(enablePercentileHistogram);
+
+        if (percentiles != null) {
+            double[] percentileArray = percentiles.stream().mapToDouble(Double::parseDouble).toArray();
+            builder.publishPercentiles(percentileArray);
+        }
+        if (serviceLevelObjectives != null) {
+            Duration[] sloArray = serviceLevelObjectives.stream()
+                    .map(Long::parseLong)
+                    .map(Duration::ofMillis)
+                    .toArray(Duration[]::new);
+            builder.serviceLevelObjectives(sloArray);
+        }
+        if (minimumExpectedValue != null) {
+            builder.minimumExpectedValue(Duration.ofMillis(minimumExpectedValue));
+        }
+        if (maximumExpectedValue != null) {
+            builder.maximumExpectedValue(Duration.ofMillis(maximumExpectedValue));
         }
     }
 
@@ -63,5 +97,73 @@ public class TimerMetricsHandler<TData, TResult> implements Handler<TData, TResu
      */
     public void setHandlerMetricsMetaDataBuilder(HandlerMetricsMetaDataBuilder<TData, TResult> handlerMetricsMetaDataBuilder) {
         this.handlerMetricsMetaDataBuilder = handlerMetricsMetaDataBuilder;
+    }
+
+    /**
+     * このハンドラによって収集されるメトリクスに、指定されたパーセンタイルのメトリクスを追加する。
+     * <p>
+     * 95パーセンタイルの情報を追加したい場合は、{@code 0.95}を設定する。
+     * </p>
+     * <p>
+     * このセッターはコンポーネント定義ファイルからプロパティとして設定されることを想定している。<br>
+     * システムリポジトリによるリストプロパティの設定は総称型に応じたキャストをサポートしていないため、
+     * いったん文字列で受け取って内部で{@code double}にパースしている。
+     * </p>
+     * <p>
+     * ここで渡した値は、{@code io.micrometer.core.instrument.Timer.Builder#publishPercentiles(double...)}の引数に渡される。
+     * </p>
+     * @param percentiles 追加するパーセンタイルのリスト
+     */
+    public void setPercentiles(List<String> percentiles) {
+        this.percentiles = percentiles;
+    }
+
+    /**
+     * ヒストグラムバケットを生成するかどうかを設定する。
+     * <p>
+     * ここで渡した値は、{@code io.micrometer.core.instrument.Timer.Builder#publishPercentileHistogram(java.lang.Boolean)}の引数に渡される。
+     * </p>
+     * @param enablePercentileHistogram ヒストグラムバケットを生成する場合は{@code true}
+     */
+    public void setEnablePercentileHistogram(boolean enablePercentileHistogram) {
+        this.enablePercentileHistogram = enablePercentileHistogram;
+    }
+
+    /**
+     * サービスレベル目標（ミリ秒）のリストを設定する。
+     * <p>
+     * このセッターはコンポーネント定義ファイルからプロパティとして設定されることを想定している。<br>
+     * システムリポジトリによるリストプロパティの設定は総称型に応じたキャストをサポートしていないため、
+     * いったん文字列で受け取って内部で{@code long}にパースしている。
+     * </p>
+     * <p>
+     * ここで渡した値は、{@code io.micrometer.core.instrument.Timer.Builder#serviceLevelObjectives(java.time.Duration...)}の引数に渡される。
+     * </p>
+     * @param serviceLevelObjectives サービスレベル目標のリスト
+     */
+    public void setServiceLevelObjectives(List<String> serviceLevelObjectives) {
+        this.serviceLevelObjectives = serviceLevelObjectives;
+    }
+
+    /**
+     * ヒストグラムバケットの下限（ミリ秒）を設定する。
+     * <p>
+     * ここで渡した値は、{@code io.micrometer.core.instrument.Timer.Builder#minimumExpectedValue(java.time.Duration)}の引数に渡される。
+     * </p>
+     * @param minimumExpectedValue ヒストグラムバケットの下限
+     */
+    public void setMinimumExpectedValue(long minimumExpectedValue) {
+        this.minimumExpectedValue = minimumExpectedValue;
+    }
+
+    /**
+     * ヒストグラムバケットの上限（ミリ秒）を設定する。
+     * <p>
+     * ここで渡した値は、{@code io.micrometer.core.instrument.Timer.Builder#maximumExpectedValue(java.time.Duration)}の引数に渡される。
+     * </p>
+     * @param maximumExpectedValue ヒストグラムバケットの上限
+     */
+    public void setMaximumExpectedValue(long maximumExpectedValue) {
+        this.maximumExpectedValue = maximumExpectedValue;
     }
 }
