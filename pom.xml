@@ -75,6 +75,12 @@
 
     <dependency>
       <groupId>com.nablarch.framework</groupId>
+      <artifactId>nablarch-common-dao</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nablarch.framework</groupId>
       <artifactId>nablarch-fw-web</artifactId>
       <optional>true</optional>
     </dependency>
