@@ -1,13 +1,18 @@
 package nablarch.integration.micrometer.instrument.binder.logging;
 
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import nablarch.core.log.basic.LogContext;
 import nablarch.core.log.basic.LogLevel;
 import nablarch.core.log.basic.LogListener;
 import nablarch.core.log.basic.LogPublisher;
+import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
 import org.junit.After;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -70,9 +75,11 @@ public class LogCountMetricsTest {
     }
 
     @Test
-    public void testCustomMetricsNameAndDescription() {
+    public void testCustomMetricsMetaData() {
         String metricsName = "test.metrics";
-        LogCountMetrics sut = new LogCountMetrics(metricsName, "Test metrics.");
+        MetricsMetaData metricsMetaData = new MetricsMetaData(
+                metricsName, "Test metrics.", Arrays.asList(Tag.of("foo", "FOO"), Tag.of("bar", "BAR")));
+        LogCountMetrics sut = new LogCountMetrics(metricsMetaData);
         sut.bindTo(registry);
 
         publisher.write(TRACE_LOG_CONTEXT);
@@ -90,13 +97,18 @@ public class LogCountMetricsTest {
         assertThat(findCounter(ERROR_LOG_CONTEXT, metricsName), is(notNullValue()));
         assertThat(findCounter(FATAL_LOG_CONTEXT, metricsName), is(notNullValue()));
 
-        assertThat(findCounter(WARN_LOG_CONTEXT, metricsName).getId().getDescription(), is("Test metrics."));
+        Meter.Id warnLogCounterId = findCounter(WARN_LOG_CONTEXT, metricsName).getId();
+        assertThat(warnLogCounterId.getDescription(), is("Test metrics."));
+        assertThat(warnLogCounterId.getTags(), hasItem(Tag.of("foo", "FOO")));
+        assertThat(warnLogCounterId.getTags(), hasItem(Tag.of("bar", "BAR")));
     }
 
     @Test
-    public void testCustomMetricsNameAndDescriptionAndLogLevel() {
+    public void testCustomMetricsMetaDataAndLogLevel() {
         String metricsName = "test.metrics";
-        LogCountMetrics sut = new LogCountMetrics(metricsName, "Test metrics.", LogLevel.ERROR);
+        MetricsMetaData metricsMetaData = new MetricsMetaData(
+                metricsName, "Test metrics.", Arrays.asList(Tag.of("foo", "FOO"), Tag.of("bar", "BAR")));
+        LogCountMetrics sut = new LogCountMetrics(metricsMetaData, LogLevel.ERROR);
         sut.bindTo(registry);
 
         publisher.write(TRACE_LOG_CONTEXT);
@@ -114,7 +126,10 @@ public class LogCountMetricsTest {
         assertThat(findCounter(ERROR_LOG_CONTEXT, metricsName), is(notNullValue()));
         assertThat(findCounter(FATAL_LOG_CONTEXT, metricsName), is(notNullValue()));
 
-        assertThat(findCounter(FATAL_LOG_CONTEXT, metricsName).getId().getDescription(), is("Test metrics."));
+        Meter.Id fatalLogCounterId = findCounter(FATAL_LOG_CONTEXT, metricsName).getId();
+        assertThat(fatalLogCounterId.getDescription(), is("Test metrics."));
+        assertThat(fatalLogCounterId.getTags(), hasItem(Tag.of("foo", "FOO")));
+        assertThat(fatalLogCounterId.getTags(), hasItem(Tag.of("bar", "BAR")));
     }
 
     @Test

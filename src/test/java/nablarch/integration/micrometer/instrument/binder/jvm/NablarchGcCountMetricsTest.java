@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import mockit.Expectations;
 import mockit.Mocked;
+import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -134,5 +135,29 @@ public class NablarchGcCountMetricsTest {
         assertThat(counter2Id.getTag("memory.manager.name"), is("memory-manager-2"));
         assertThat(counter2Id.getTag("fizz"), is("FIZZ"));
         assertThat(counter2Id.getDescription(), is("Test metrics."));
+    }
+
+    @Test
+    public void testCustomMetricsNameAndDescriptionAndTagWithMetircsMetaData() {
+        MetricsMetaData metricsMetaData = new MetricsMetaData(
+                "test.metrics.metadata",
+                "Test metrics metadata.",
+                Collections.singleton(Tag.of("buzz", "BUZZ"))
+        );
+        NablarchGcCountMetrics metrics = new NablarchGcCountMetrics(metricsMetaData);
+        metrics.bindTo(registry);
+
+        Collection<FunctionCounter> counters = registry.get("test.metrics.metadata").functionCounters();
+        Iterator<FunctionCounter> iterator = counters.iterator();
+
+        Meter.Id counter1Id = iterator.next().getId();
+        assertThat(counter1Id.getTag("memory.manager.name"), is("memory-manager-1"));
+        assertThat(counter1Id.getTag("buzz"), is("BUZZ"));
+        assertThat(counter1Id.getDescription(), is("Test metrics metadata."));
+
+        Meter.Id counter2Id = iterator.next().getId();
+        assertThat(counter2Id.getTag("memory.manager.name"), is("memory-manager-2"));
+        assertThat(counter2Id.getTag("buzz"), is("BUZZ"));
+        assertThat(counter2Id.getDescription(), is("Test metrics metadata."));
     }
 }

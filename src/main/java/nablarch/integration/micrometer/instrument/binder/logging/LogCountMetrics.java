@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.binder.MeterBinder;
 import nablarch.core.log.basic.LogLevel;
 import nablarch.core.log.basic.LogListener;
 import nablarch.core.log.basic.LogPublisher;
+import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
 
 import java.io.Closeable;
 
@@ -51,8 +52,7 @@ public class LogCountMetrics implements MeterBinder, Closeable {
     static final String TAG_NAME_RUNTIME_LOGGER = "logger";
 
     private final LogLevel logLevel;
-    private final String metricsName;
-    private final String metricsDescription;
+    private final MetricsMetaData metricsMetaData;
     private LogListener logListener;
 
     /**
@@ -70,27 +70,24 @@ public class LogCountMetrics implements MeterBinder, Closeable {
      * @param logLevel ログレベル
      */
     public LogCountMetrics(LogLevel logLevel) {
-        this(DEFAULT_METRICS_NAME, DEFAULT_METRICS_DESCRIPTION, logLevel);
+        this(new MetricsMetaData(DEFAULT_METRICS_NAME, DEFAULT_METRICS_DESCRIPTION), logLevel);
     }
 
     /**
-     * ログレベルを指定するコンストラクタ。
-     * @param metricsName メトリクス名
-     * @param metricsDescription メトリクスの説明
+     * メトリクスの設定情報を指定するコンストラクタ。
+     * @param metricsMetaData メトリクスの設定情報
      */
-    public LogCountMetrics(String metricsName, String metricsDescription) {
-        this(metricsName, metricsDescription, DEFAULT_LOG_LEVEL);
+    public LogCountMetrics(MetricsMetaData metricsMetaData) {
+        this(metricsMetaData, DEFAULT_LOG_LEVEL);
     }
 
     /**
      * ログレベルを指定するコンストラクタ。
-     * @param metricsName メトリクス名
-     * @param metricsDescription メトリクスの説明
+     * @param metricsMetaData メトリクスの設定情報
      * @param logLevel ログレベル
      */
-    public LogCountMetrics(String metricsName, String metricsDescription, LogLevel logLevel) {
-        this.metricsName = metricsName;
-        this.metricsDescription = metricsDescription;
+    public LogCountMetrics(MetricsMetaData metricsMetaData, LogLevel logLevel) {
+        this.metricsMetaData = metricsMetaData;
         this.logLevel = logLevel;
     }
 
@@ -101,10 +98,11 @@ public class LogCountMetrics implements MeterBinder, Closeable {
                 return;
             }
 
-            Counter.builder(metricsName)
+            Counter.builder(metricsMetaData.getName())
                     .tag(TAG_NAME_LEVEL, logContext.getLevel().name())
                     .tag(TAG_NAME_RUNTIME_LOGGER, logContext.getRuntimeLoggerName())
-                    .description(metricsDescription)
+                    .tags(metricsMetaData.getTags())
+                    .description(metricsMetaData.getDescription())
                     .register(registry)
                     .increment();
         };
