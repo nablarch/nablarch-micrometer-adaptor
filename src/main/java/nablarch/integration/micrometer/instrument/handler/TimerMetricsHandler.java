@@ -20,9 +20,9 @@ public class TimerMetricsHandler<TData, TResult> implements Handler<TData, TResu
     private MeterRegistry meterRegistry;
     private HandlerMetricsMetaDataBuilder<TData, TResult> handlerMetricsMetaDataBuilder;
 
-    private List<String> percentiles;
+    private double[] percentiles;
     private boolean enablePercentileHistogram;
-    private List<String> serviceLevelObjectives;
+    private Duration[] serviceLevelObjectives;
     private Long minimumExpectedValue;
     private Long maximumExpectedValue;
 
@@ -65,15 +65,10 @@ public class TimerMetricsHandler<TData, TResult> implements Handler<TData, TResu
         builder.publishPercentileHistogram(enablePercentileHistogram);
 
         if (percentiles != null) {
-            double[] percentileArray = percentiles.stream().mapToDouble(Double::parseDouble).toArray();
-            builder.publishPercentiles(percentileArray);
+            builder.publishPercentiles(percentiles);
         }
         if (serviceLevelObjectives != null) {
-            Duration[] sloArray = serviceLevelObjectives.stream()
-                    .map(Long::parseLong)
-                    .map(Duration::ofMillis)
-                    .toArray(Duration[]::new);
-            builder.serviceLevelObjectives(sloArray);
+            builder.serviceLevelObjectives(serviceLevelObjectives);
         }
         if (minimumExpectedValue != null) {
             builder.minimumExpectedValue(Duration.ofMillis(minimumExpectedValue));
@@ -115,7 +110,7 @@ public class TimerMetricsHandler<TData, TResult> implements Handler<TData, TResu
      * @param percentiles 追加するパーセンタイルのリスト
      */
     public void setPercentiles(List<String> percentiles) {
-        this.percentiles = percentiles;
+        this.percentiles = percentiles.stream().mapToDouble(Double::parseDouble).toArray();
     }
 
     /**
@@ -142,7 +137,10 @@ public class TimerMetricsHandler<TData, TResult> implements Handler<TData, TResu
      * @param serviceLevelObjectives サービスレベル目標のリスト
      */
     public void setServiceLevelObjectives(List<String> serviceLevelObjectives) {
-        this.serviceLevelObjectives = serviceLevelObjectives;
+        this.serviceLevelObjectives = serviceLevelObjectives.stream()
+                                        .map(Long::parseLong)
+                                        .map(Duration::ofMillis)
+                                        .toArray(Duration[]::new);;
     }
 
     /**
