@@ -3,13 +3,11 @@ package nablarch.integration.micrometer.instrument.handler;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.distribution.CountAtBucket;
-import io.micrometer.core.instrument.distribution.HistogramSnapshot;
 import io.micrometer.core.instrument.distribution.ValueAtPercentile;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
-import mockit.Expectations;
-import mockit.Mocked;
 import nablarch.fw.ExecutionContext;
+import nablarch.fw.Handler;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,17 +25,14 @@ import static org.hamcrest.Matchers.*;
  * @author Tanaka Tomoyuki
  */
 public class TimerMetricsHandlerPercentilesTest {
-    @Mocked
-    private ExecutionContext context;
+    private final ExecutionContext context = new ExecutionContext();
 
     private final TimerMetricsHandler<String, String> sut = new TimerMetricsHandler<>();
     private final PrometheusMeterRegistry meterRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
 
     @Before
     public void setUp() {
-        new Expectations() {{
-            context.handleNext("PARAM"); result = "RESULT";
-        }};
+        context.addHandler((Handler<String, String>) (param, context) -> "RESULT");
 
         sut.setMeterRegistry(meterRegistry);
         sut.setHandlerMetricsMetaDataBuilder(metricsMetaDataBuilder);
