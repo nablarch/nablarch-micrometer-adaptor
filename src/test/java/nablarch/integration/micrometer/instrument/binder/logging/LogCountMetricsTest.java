@@ -11,6 +11,7 @@ import nablarch.core.log.basic.LogPublisher;
 import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
 import org.junit.After;
 import org.junit.Test;
+import sun.rmi.runtime.Log;
 
 import java.util.Arrays;
 
@@ -184,6 +185,21 @@ public class LogCountMetricsTest {
 
         assertThat(findCounter(warnContext).count(), is(1.0));
         assertThat(findCounter(errorContext).count(), is(1.0));
+    }
+
+    @Test
+    public void testCountForEachRuntimeLoggers() {
+        sut.bindTo(registry);
+
+        LogLevel logLevel = LogLevel.WARN;
+        LogContext fooWarnContext = new LogContext("TEST", "foo", logLevel, "foo warn context", null);
+        LogContext barWarnContext = new LogContext("TEST", "bar", logLevel, "bar warn context", null);
+
+        publisher.write(fooWarnContext);
+        publisher.write(barWarnContext);
+
+        assertThat(findCounter(fooWarnContext).count(), is(1.0));
+        assertThat(findCounter(barWarnContext).count(), is(1.0));
     }
 
     private static class MockLogListener implements LogListener {
