@@ -185,10 +185,27 @@ public class LogCountMetricsTest {
         LogPublisher.removeAllListeners();
     }
 
+    /**
+     * 指定されたログコンテキストの出力をカウントした {@link Counter} を、デフォルトのメトリクス名で検索する。
+     * <p>
+     * 該当する {@link Counter} が見つからない場合は {@code null} を返す。
+     * </p>
+     * @param logContext カウント対象のログコンテキスト
+     * @return ログコンテキストの出力をカウントした {@link Counter}
+     */
     private Counter findCounter(LogContext logContext) {
         return findCounter(logContext, LogCountMetrics.DEFAULT_METRICS_NAME);
     }
 
+    /**
+     * 指定されたログコンテキストの出力をカウントした {@link Counter} を、指定されたメトリクス名で検索する。
+     * <p>
+     * 該当する {@link Counter} が見つからない場合は {@code null} を返す。
+     * </p>
+     * @param logContext カウント対象のログコンテキスト
+     * @param metricsName メトリクス名
+     * @return ログコンテキストの出力をカウントした {@link Counter}
+     */
     private Counter findCounter(LogContext logContext, String metricsName) {
         return registry.find(metricsName)
                 .tag(LogCountMetrics.TAG_NAME_RUNTIME_LOGGER, logContext.getRuntimeLoggerName())
