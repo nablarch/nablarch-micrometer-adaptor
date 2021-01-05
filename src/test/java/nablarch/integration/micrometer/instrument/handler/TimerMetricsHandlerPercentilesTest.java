@@ -14,6 +14,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -87,8 +88,8 @@ public class TimerMetricsHandlerPercentilesTest {
 
         Timer timer = meterRegistry.find(metricsMetaDataBuilder.getMetricsName()).timer();
 
-        List<Double> buckets = Stream.of(timer.takeSnapshot().histogramCounts()).map(CountAtBucket::bucket).collect(Collectors.toList());
-        assertThat(buckets, hasItems(9.0e10, 9.9e10));
+        List<Double> buckets = Stream.of(timer.takeSnapshot().histogramCounts()).map(cab -> cab.bucket(TimeUnit.MILLISECONDS)).collect(Collectors.toList());
+        assertThat(buckets, hasItems(90000.0, 99000.0));
     }
 
     @Test
@@ -100,8 +101,8 @@ public class TimerMetricsHandlerPercentilesTest {
 
         Timer timer = meterRegistry.find(metricsMetaDataBuilder.getMetricsName()).timer();
 
-        List<Double> buckets = Stream.of(timer.takeSnapshot().histogramCounts()).map(CountAtBucket::bucket).collect(Collectors.toList());
-        assertThat(buckets, hasItems(9.87E8));
+        List<Double> buckets = Stream.of(timer.takeSnapshot().histogramCounts()).map(cab -> cab.bucket(TimeUnit.MILLISECONDS)).collect(Collectors.toList());
+        assertThat(buckets, hasItems(987.0));
     }
 
     @Test
@@ -113,8 +114,8 @@ public class TimerMetricsHandlerPercentilesTest {
 
         Timer timer = meterRegistry.find(metricsMetaDataBuilder.getMetricsName()).timer();
 
-        List<Double> buckets = Stream.of(timer.takeSnapshot().histogramCounts()).map(CountAtBucket::bucket).collect(Collectors.toList());
-        assertThat(buckets, hasItems(4.5678E10));
+        List<Double> buckets = Stream.of(timer.takeSnapshot().histogramCounts()).map(cab -> cab.bucket(TimeUnit.MILLISECONDS)).collect(Collectors.toList());
+        assertThat(buckets, hasItems(45678.0));
     }
 
     private HandlerMetricsMetaDataBuilder<String, String> metricsMetaDataBuilder = new HandlerMetricsMetaDataBuilder<String, String>() {
