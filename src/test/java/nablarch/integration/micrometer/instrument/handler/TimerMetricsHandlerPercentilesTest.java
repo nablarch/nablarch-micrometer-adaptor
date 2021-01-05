@@ -28,6 +28,9 @@ public class TimerMetricsHandlerPercentilesTest {
     private final ExecutionContext context = new ExecutionContext();
 
     private final TimerMetricsHandler<String, String> sut = new TimerMetricsHandler<>();
+
+    // SimpleMeterRegistry はパーセンタイル近似をサポートしない設定のため、ヒストグラムのバケットが取得できない。
+    // このため本テストでは、パーセンタイル近似をサポートしているPrometheusMeterRegistryを利用している。
     private final PrometheusMeterRegistry meterRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
 
     @Before
