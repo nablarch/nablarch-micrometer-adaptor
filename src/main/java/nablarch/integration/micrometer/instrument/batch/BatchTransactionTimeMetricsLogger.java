@@ -2,6 +2,7 @@ package nablarch.integration.micrometer.instrument.batch;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
 import nablarch.core.ThreadContext;
 import nablarch.core.log.app.CommitLogger;
@@ -44,7 +45,7 @@ public class BatchTransactionTimeMetricsLogger implements CommitLogger {
         Tag batchClass = BatchActionClassTagUtil.obtain(ThreadContext.getRequestId());
         sample.stop(meterRegistry, Timer.builder(metricsName)
                 .description(metricsDescription)
-                .tags(Collections.singleton(batchClass)));
+                .tags(Tags.of(batchClass)));
 
         beginTimer();
     }

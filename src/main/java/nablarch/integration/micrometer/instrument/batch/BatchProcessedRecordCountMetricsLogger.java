@@ -3,10 +3,9 @@ package nablarch.integration.micrometer.instrument.batch;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 import nablarch.core.ThreadContext;
 import nablarch.core.log.app.CommitLogger;
-
-import java.util.Collections;
 
 /**
  * バッチの処理件数をメトリクスとして収集する{@link CommitLogger}の実装クラス。
@@ -42,7 +41,7 @@ public class BatchProcessedRecordCountMetricsLogger implements CommitLogger {
         Tag tag = BatchActionClassTagUtil.obtain(ThreadContext.getRequestId());
 
         Counter.builder(metricsName)
-                .tags(Collections.singleton(tag))
+                .tags(Tags.of(tag))
                 .description(metricsDescription)
                 .register(meterRegistry)
                 .increment(count);
