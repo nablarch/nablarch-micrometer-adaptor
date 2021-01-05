@@ -51,7 +51,7 @@ public class LogCountMetrics implements MeterBinder, Closeable {
      */
     static final String TAG_NAME_RUNTIME_LOGGER = "logger";
 
-    private final LogLevel logLevel;
+    private final LogLevel thresholdOfLogLevel;
     private final MetricsMetaData metricsMetaData;
     private LogListener logListener;
 
@@ -66,11 +66,15 @@ public class LogCountMetrics implements MeterBinder, Closeable {
     }
 
     /**
-     * ログレベルを指定するコンストラクタ。
-     * @param logLevel ログレベル
+     * 収集するログレベルのしきい値を指定するコンストラクタ。
+     * <p>
+     * 指定されたログレベル以上のログ出力が計測の対象となる。
+     * </p>
+     *
+     * @param thresholdOfLogLevel ログレベルのしきい値
      */
-    public LogCountMetrics(LogLevel logLevel) {
-        this(new MetricsMetaData(DEFAULT_METRICS_NAME, DEFAULT_METRICS_DESCRIPTION), logLevel);
+    public LogCountMetrics(LogLevel thresholdOfLogLevel) {
+        this(new MetricsMetaData(DEFAULT_METRICS_NAME, DEFAULT_METRICS_DESCRIPTION), thresholdOfLogLevel);
     }
 
     /**
@@ -82,19 +86,23 @@ public class LogCountMetrics implements MeterBinder, Closeable {
     }
 
     /**
-     * ログレベルを指定するコンストラクタ。
+     * メトリクスの設定情報と、収集するログレベルのしきい値を指定するコンストラクタ。
+     * <p>
+     * 指定されたログレベル以上のログ出力が計測の対象となる。
+     * </p>
+     *
      * @param metricsMetaData メトリクスの設定情報
-     * @param logLevel ログレベル
+     * @param thresholdOfLogLevel ログレベルのしきい値
      */
-    public LogCountMetrics(MetricsMetaData metricsMetaData, LogLevel logLevel) {
+    public LogCountMetrics(MetricsMetaData metricsMetaData, LogLevel thresholdOfLogLevel) {
         this.metricsMetaData = metricsMetaData;
-        this.logLevel = logLevel;
+        this.thresholdOfLogLevel = thresholdOfLogLevel;
     }
 
     @Override
     public void bindTo(MeterRegistry registry) {
         logListener = logContext -> {
-            if (logLevel.getValue() < logContext.getLevel().getValue()) {
+            if (thresholdOfLogLevel.getValue() < logContext.getLevel().getValue()) {
                 return;
             }
 
