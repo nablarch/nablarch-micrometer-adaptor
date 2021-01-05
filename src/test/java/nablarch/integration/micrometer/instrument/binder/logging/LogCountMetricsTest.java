@@ -171,6 +171,21 @@ public class LogCountMetricsTest {
         assertThat(mockLogListener.count, is(2));
     }
 
+    @Test
+    public void testCountForEachLogLevels() {
+        sut.bindTo(registry);
+
+        String runtimeLoggerName = "TestLogger";
+        LogContext warnContext = new LogContext("TEST", runtimeLoggerName, LogLevel.WARN, "warn context", null);
+        LogContext errorContext = new LogContext("TEST", runtimeLoggerName, LogLevel.ERROR, "error context", null);
+
+        publisher.write(warnContext);
+        publisher.write(errorContext);
+
+        assertThat(findCounter(warnContext).count(), is(1.0));
+        assertThat(findCounter(errorContext).count(), is(1.0));
+    }
+
     private static class MockLogListener implements LogListener {
         private int count;
 
