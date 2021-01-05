@@ -90,6 +90,15 @@ public class LogCountMetricsTest {
         publisher.write(ERROR_LOG_CONTEXT);
         publisher.write(FATAL_LOG_CONTEXT);
 
+        /*
+         * ログレベルのしきい値を検証をしている理由について
+         *
+         * LogCountMetrics(MetricsMetaData)は、ログレベルのしきい値を受け取らない。
+         * にもかかわらず、本テスト内ではログレベルのしきい値を検証している。
+         *
+         * これは、デフォルトのログレベルのしきい値(DEFAULT_LOG_LEVEL)が
+         * 正しく使用されていることを確認することが目的となっている。
+         */
         assertThat(findCounter(TRACE_LOG_CONTEXT, metricsName), is(nullValue()));
         assertThat(findCounter(DEBUG_LOG_CONTEXT, metricsName), is(nullValue()));
         assertThat(findCounter(INFO_LOG_CONTEXT, metricsName), is(nullValue()));
