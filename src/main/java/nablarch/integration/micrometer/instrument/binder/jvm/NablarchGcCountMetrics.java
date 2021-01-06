@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.FunctionCounter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.MeterBinder;
+import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
@@ -19,18 +20,16 @@ import java.util.List;
  * @author Tanaka Tomoyuki
  */
 public class NablarchGcCountMetrics implements MeterBinder {
-    /**
-     * デフォルトのメトリクス名。
-     */
+    /** デフォルトのメトリクス名。 */
     static final String DEFAULT_METRICS_NAME = "jvm.gc.count";
-
-    /**
-     * デフォルトのメトリクスの説明。
-     */
+    /** デフォルトのメトリクスの説明。 */
     static final String DEFAULT_METRICS_DESCRIPTION = "Count of garbage collection";
 
+    /** 追加のタグ一覧。 */
     private final Iterable<Tag> tags;
+    /** メトリクス名。 */
     private final String metricsName;
+    /** メトリクスの説明。 */
     private final String metricsDescription;
 
     /**
@@ -55,6 +54,16 @@ public class NablarchGcCountMetrics implements MeterBinder {
      */
     public NablarchGcCountMetrics(Iterable<Tag> tags) {
         this(DEFAULT_METRICS_NAME, DEFAULT_METRICS_DESCRIPTION, tags);
+    }
+
+    /**
+     * メトリクス名と説明、追加のタグを{@link MetricsMetaData}で指定するコンストラクタ。
+     * @param metricsMetaData メトリクスの設定情報
+     */
+    public NablarchGcCountMetrics(MetricsMetaData metricsMetaData) {
+        this.metricsName = metricsMetaData.getName();
+        this.metricsDescription = metricsMetaData.getDescription();
+        this.tags = metricsMetaData.getTags();
     }
 
     /**

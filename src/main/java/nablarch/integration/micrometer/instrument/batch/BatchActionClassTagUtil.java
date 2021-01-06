@@ -21,5 +21,8 @@ public final class BatchActionClassTagUtil {
         return Tag.of("class", tokens[0]);
     }
 
+    /**
+     * 本クラスはインスタンスを生成しない。
+     */
     private BatchActionClassTagUtil() {}
 }

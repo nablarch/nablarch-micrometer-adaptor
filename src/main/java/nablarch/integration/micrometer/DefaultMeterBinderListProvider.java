@@ -31,8 +31,10 @@ import java.util.List;
  * @author Tanaka Tomoyuki
  */
 public class DefaultMeterBinderListProvider implements MeterBinderListProvider, Disposable {
+    /** ロガー。 */
     private static final Logger LOGGER = LoggerManager.get(DefaultMeterBinderListProvider.class);
 
+    /** 供給する {@link MeterBinder} のリスト。 */
     private final List<MeterBinder> meterBinderList;
 
     /**

@@ -3,9 +3,11 @@ package nablarch.integration.micrometer.instrument.binder.jvm;
 import io.micrometer.core.instrument.FunctionCounter;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import mockit.Expectations;
 import mockit.Mocked;
+import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +15,6 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -118,7 +119,7 @@ public class NablarchGcCountMetricsTest {
         NablarchGcCountMetrics metrics = new NablarchGcCountMetrics(
             "test.metrics",
             "Test metrics.",
-            Collections.singleton(Tag.of("fizz", "FIZZ"))
+            Tags.of("fizz", "FIZZ")
         );
         metrics.bindTo(registry);
 
@@ -134,5 +135,29 @@ public class NablarchGcCountMetricsTest {
         assertThat(counter2Id.getTag("memory.manager.name"), is("memory-manager-2"));
         assertThat(counter2Id.getTag("fizz"), is("FIZZ"));
         assertThat(counter2Id.getDescription(), is("Test metrics."));
+    }
+
+    @Test
+    public void testCustomMetricsNameAndDescriptionAndTagWithMetircsMetaData() {
+        MetricsMetaData metricsMetaData = new MetricsMetaData(
+                "test.metrics.metadata",
+                "Test metrics metadata.",
+                Tags.of("buzz", "BUZZ")
+        );
+        NablarchGcCountMetrics metrics = new NablarchGcCountMetrics(metricsMetaData);
+        metrics.bindTo(registry);
+
+        Collection<FunctionCounter> counters = registry.get("test.metrics.metadata").functionCounters();
+        Iterator<FunctionCounter> iterator = counters.iterator();
+
+        Meter.Id counter1Id = iterator.next().getId();
+        assertThat(counter1Id.getTag("memory.manager.name"), is("memory-manager-1"));
+        assertThat(counter1Id.getTag("buzz"), is("BUZZ"));
+        assertThat(counter1Id.getDescription(), is("Test metrics metadata."));
+
+        Meter.Id counter2Id = iterator.next().getId();
+        assertThat(counter2Id.getTag("memory.manager.name"), is("memory-manager-2"));
+        assertThat(counter2Id.getTag("buzz"), is("BUZZ"));
+        assertThat(counter2Id.getDescription(), is("Test metrics metadata."));
     }
 }
