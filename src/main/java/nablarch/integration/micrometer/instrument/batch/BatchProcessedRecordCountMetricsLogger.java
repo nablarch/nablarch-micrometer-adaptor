@@ -19,9 +19,9 @@ import nablarch.core.log.app.CommitLogger;
  * @author Tanaka Tomoyuki
  */
 public class BatchProcessedRecordCountMetricsLogger implements CommitLogger {
-    /** メトリクス名のデフォルト値。 */
+    /** デフォルトのメトリクス名。 */
     static final String DEFAULT_METRICS_NAME = "batch.processed.record.count";
-    /** メトリクスの説明のデフォルト値。 */
+    /** デフォルトのメトリクスの説明。 */
     static final String DEFAULT_METRICS_DESCRIPTION = "Count of processed records.";
 
     /** 使用する {@link MeterRegistry}。 */
