@@ -26,33 +26,29 @@ import java.io.Closeable;
  * @author Tanaka Tomoyuki
  */
 public class LogCountMetrics implements MeterBinder, Closeable {
-    /**
-     * デフォルトのメトリクスの名前。
-     */
+    /** デフォルトのメトリクスの名前。 */
     static final String DEFAULT_METRICS_NAME = "log.count";
-
-    /**
-     * デフォルトのメトリクスの説明。
-     */
+    /** デフォルトのメトリクスの説明。 */
     static final String DEFAULT_METRICS_DESCRIPTION = "Logging count for each log level and runtime logger.";
 
-    /**
-     * デフォルトのログレベル。
-     */
+    /** デフォルトのログレベル。 */
     private static final LogLevel DEFAULT_LOG_LEVEL = LogLevel.WARN;
-
-    /**
-     * ログレベルのタグ名。
-     */
+    /** ログレベルのタグ名。 */
     static final String TAG_NAME_LEVEL = "level";
-
-    /**
-     * 実行時ロガー名のタグ名。
-     */
+    /** 実行時ロガー名のタグ名。 */
     static final String TAG_NAME_RUNTIME_LOGGER = "logger";
 
+    /** 収集対象となるログレベルのしきい値。 */
     private final LogLevel thresholdOfLogLevel;
+    /** メトリクスのメタ情報。 */
     private final MetricsMetaData metricsMetaData;
+    /**
+     * {@link LogPublisher} に設定する {@link LogListener} のキャッシュ。
+     * <p>
+     * {@link #close()} のときに {@link LogPublisher#removeListener(LogListener)} で削除できるようにするため、
+     * フィールドで保持している。
+     * </p>
+     */
     private LogListener logListener;
 
     /**

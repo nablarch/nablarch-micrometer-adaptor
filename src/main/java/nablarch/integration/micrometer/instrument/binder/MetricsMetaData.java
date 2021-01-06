@@ -10,8 +10,11 @@ import java.util.Collections;
  * @author Tanaka Tomoyuki
  */
 public class MetricsMetaData {
+    /** メトリクス名。 */
     private final String name;
+    /** メトリクスの説明。 */
     private final String description;
+    /** タグの一覧。 */
     private final Iterable<Tag> tags;
 
     /**

@@ -5,7 +5,9 @@ package nablarch.integration.micrometer.instrument.binder.jmx;
  * @author Tanaka Tomoyuki
  */
 public class MBeanAttributeCondition {
+    /** オブジェクト名。 */
     private final String objectName;
+    /** 属性名。 */
     private final String attribute;
 
     /**

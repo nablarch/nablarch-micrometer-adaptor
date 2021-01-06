@@ -18,20 +18,19 @@ import java.util.Collections;
  * @author Tanaka Tomoyuki
  */
 public class BatchTransactionTimeMetricsLogger implements CommitLogger {
+    /** {@link Timer} を {@link ThreadContext} に保存するときに使用するキー。 */
     private static final String THREAD_CONTEXT_KEY_TIMER_SAMPLE = "nablarch_transaction_timer_sample";
 
-    /**
-     * デフォルトのメトリクス名。
-     */
+    /** デフォルトのメトリクス名。 */
     static final String DEFAULT_METRICS_NAME = "batch.transaction.time";
-
-    /**
-     * デフォルトのメトリクスの説明。
-     */
+    /** デフォルトのメトリクスの説明。 */
     static final String DEFAULT_METRICS_DESCRIPTION = "Batch transaction time.";
 
+    /** 使用する {@link MeterRegistry}。 */
     private MeterRegistry meterRegistry;
+    /** メトリクス名。 */
     private String metricsName = DEFAULT_METRICS_NAME;
+    /** メトリクスの説明。 */
     private String metricsDescription = DEFAULT_METRICS_DESCRIPTION;
 
     @Override
@@ -50,6 +49,9 @@ public class BatchTransactionTimeMetricsLogger implements CommitLogger {
         beginTimer();
     }
 
+    /**
+     * {@link Timer} を起動し、 {@link ThreadContext} に {@link Timer} を保存する。
+     */
     private void beginTimer() {
         Timer.Sample sample = Timer.start(meterRegistry);
         ThreadContext.setObject(THREAD_CONTEXT_KEY_TIMER_SAMPLE, sample);

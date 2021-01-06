@@ -17,13 +17,20 @@ import java.util.stream.Collectors;
  * @author Tanaka Tomoyuki
  */
 public class TimerMetricsHandler<TData, TResult> implements Handler<TData, TResult> {
+    /** 使用する{@link MeterRegistry}。 */
     private MeterRegistry meterRegistry;
+    /** {@link HandlerMetricsMetaDataBuilder}。 */
     private HandlerMetricsMetaDataBuilder<TData, TResult> handlerMetricsMetaDataBuilder;
 
+    /** 収集対象のパーセンタイル。 */
     private double[] percentiles;
+    /** ヒストグラムバケットの連携の有効・無効フラグ。 */
     private boolean enablePercentileHistogram;
+    /** SLOに基づく追加のバケット。 */
     private Duration[] serviceLevelObjectives;
+    /** バケットの最小値。 */
     private Long minimumExpectedValue;
+    /** バケットの最大値。 */
     private Long maximumExpectedValue;
 
     @Override
@@ -61,6 +68,10 @@ public class TimerMetricsHandler<TData, TResult> implements Handler<TData, TResu
         }
     }
 
+    /**
+     * パーセンタイルについての設定を行う。
+     * @param builder 設定対象の{@link io.micrometer.core.instrument.Timer.Builder}
+     */
     private void setupPercentileOptions(Timer.Builder builder) {
         builder.publishPercentileHistogram(enablePercentileHistogram);
 

@@ -65,17 +65,14 @@ import java.util.List;
  * @author Tanaka Tomoyuki
  */
 public class HttpRequestTimeMetricsMetaDataBuilder implements HandlerMetricsMetaDataBuilder<HttpRequest, Object> {
-    /**
-     * デフォルトのメトリクス名。
-     */
+    /** デフォルトのメトリクス名。 */
     static final String DEFAULT_METRICS_NAME = "http.server.requests";
-
-    /**
-     * デフォルトのメトリクスの説明。
-     */
+    /** デフォルトのメトリクスの説明。 */
     static final String DEFAULT_METRICS_DESCRIPTION = "HTTP request metrics measured by Timer.";
 
+    /** メトリクス名。 */
     private String metricsName = DEFAULT_METRICS_NAME;
+    /** メトリクスの説明。 */
     private String metricsDescription = DEFAULT_METRICS_DESCRIPTION;
 
     @Override
@@ -109,6 +106,11 @@ public class HttpRequestTimeMetricsMetaDataBuilder implements HandlerMetricsMeta
         );
     }
 
+    /**
+     * {@code method} タグに設定する値を構築する。
+     * @param method 実行されたメソッド
+     * @return {@code method} タグに設定する値
+     */
     private String buildMethodTag(Method method) {
         StringBuilder sb = new StringBuilder(method.getName());
 
@@ -119,6 +121,11 @@ public class HttpRequestTimeMetricsMetaDataBuilder implements HandlerMetricsMeta
         return sb.toString();
     }
 
+    /**
+     * {@code outcome} タグに設定する値を解決する。
+     * @param statusCode レスポンスのステータスコード
+     * @return {@code outcome} タグに設定する値
+     */
     private String resolveOutcome(int statusCode) {
         if (100 <= statusCode && statusCode < 200) {
             return "INFORMATION";
@@ -135,6 +142,12 @@ public class HttpRequestTimeMetricsMetaDataBuilder implements HandlerMetricsMeta
         }
     }
 
+    /**
+     * {@code exception} タグに設定する値を解決する。
+     * @param context 実行コンテキスト
+     * @param thrownThrowable スローされた例外
+     * @return {@code exception} タグに設定する値
+     */
     private String resolveException(ExecutionContext context, Throwable thrownThrowable) {
         Throwable throwable = thrownThrowable != null ? thrownThrowable : context.getException();
         return throwable == null ? "None" : throwable.getClass().getSimpleName();

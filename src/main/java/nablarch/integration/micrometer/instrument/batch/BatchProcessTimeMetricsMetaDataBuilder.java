@@ -25,17 +25,14 @@ import java.util.Objects;
  * @author Tanaka Tomoyuki
  */
 public class BatchProcessTimeMetricsMetaDataBuilder implements HandlerMetricsMetaDataBuilder<CommandLine, Object> {
-    /**
-     * デフォルトのメトリクス名。
-     */
+    /** デフォルトのメトリクス名。 */
     static final String DEFAULT_METRICS_NAME = "batch.process.time";
-
-    /**
-     * デフォルトのメトリクスの説明。
-     */
+    /** デフォルトのメトリクスの説明。 */
     static final String DEFAULT_METRICS_DESCRIPTION = "Batch process time.";
 
+    /** メトリクス名。 */
     private String metricsName = DEFAULT_METRICS_NAME;
+    /** メトリクスの説明。 */
     private String metricsDescription = DEFAULT_METRICS_DESCRIPTION;
 
     @Override

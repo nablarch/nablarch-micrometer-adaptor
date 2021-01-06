@@ -20,18 +20,16 @@ import java.util.List;
  * @author Tanaka Tomoyuki
  */
 public class NablarchGcCountMetrics implements MeterBinder {
-    /**
-     * デフォルトのメトリクス名。
-     */
+    /** デフォルトのメトリクス名。 */
     static final String DEFAULT_METRICS_NAME = "jvm.gc.count";
-
-    /**
-     * デフォルトのメトリクスの説明。
-     */
+    /** デフォルトのメトリクスの説明。 */
     static final String DEFAULT_METRICS_DESCRIPTION = "Count of garbage collection";
 
+    /** 追加のタグ一覧。 */
     private final Iterable<Tag> tags;
+    /** メトリクス名。 */
     private final String metricsName;
+    /** メトリクスの説明。 */
     private final String metricsDescription;
 
     /**

@@ -29,40 +29,26 @@ import java.util.function.Supplier;
  * @author Tanaka Tomoyuki
  */
 public class SqlTimeMetricsDaoContext implements DaoContext {
-    /**
-     * デフォルトのメトリクス名。
-     */
+    /** デフォルトのメトリクス名。 */
     static final String DEFAULT_METRICS_NAME = "sql.process.time";
-
-    /**
-     * デフォルトのメトリクスの説明。
-     */
+    /** デフォルトのメトリクスの説明。 */
     static final String DEFAULT_METRICS_DESCRIPTION = "Time of processing sql.";
-
-    /**
-     * SQLIDのタグ名。
-     */
+    /** SQLIDのタグ名。 */
     static final String TAG_NAME_SQL_ID = "sql.id";
-
-    /**
-     * エンティティ名のタグ名。
-     */
+    /** エンティティ名のタグ名。 */
     static final String TAG_NAME_ENTITY_NAME = "entity";
-
-    /**
-     * 実行されたメソッド名のタグ名。
-     */
+    /** 実行されたメソッド名のタグ名。 */
     static final String TAG_NAME_METHOD_NAME = "method";
-
-    /**
-     * SQLIDが無い場合に設定されるタグの値。
-     */
+    /** SQLIDが無い場合に設定されるタグの値。 */
     static final String TAG_VALUE_NO_SQL_ID = "None";
 
+    /** 移譲先の{@link DaoContext}。 */
     private final DaoContext delegate;
+    /** 使用する{@link MeterRegistry}。 */
     private final MeterRegistry meterRegistry;
-
+    /** メトリクス名。 */
     private String metricsName = DEFAULT_METRICS_NAME;
+    /** メトリクスの説明。 */
     private String metricsDescription = DEFAULT_METRICS_DESCRIPTION;
 
     /**
@@ -144,6 +130,12 @@ public class SqlTimeMetricsDaoContext implements DaoContext {
         recordEntityListUpdate(entities, "batchDelete", () -> delegate.batchDelete(entities));
     }
 
+    /**
+     * エンティティリストの更新系メソッドの時間を計測する。
+     * @param entities エンティティリスト
+     * @param methodName 実行された{@link DaoContext}のメソッド名
+     * @param execution 計測対象の更新処理
+     */
     private void recordEntityListUpdate(List<?> entities, String methodName, Runnable execution) {
         if (entities == null || entities.isEmpty()) {
             execution.run();
@@ -156,6 +148,14 @@ public class SqlTimeMetricsDaoContext implements DaoContext {
         });
     }
 
+    /**
+     * エンティティの更新系メソッドの時間を計測する。
+     * @param entity エンティティ
+     * @param methodName 実行された{@link DaoContext}のメソッド名
+     * @param execution 計測対象の更新処理
+     * @param <T> {@code execution} が返す値の型
+     * @return {@code execution} が返した値
+     */
     private <T> T recordEntityUpdate(Object entity, String methodName, Supplier<T> execution) {
         if (entity == null) {
             return execution.get();
@@ -164,6 +164,15 @@ public class SqlTimeMetricsDaoContext implements DaoContext {
         return recordTime(TAG_VALUE_NO_SQL_ID, entity.getClass(), methodName, execution);
     }
 
+    /**
+     * 指定された処理の時間を計測する。
+     * @param sqlId SQIID
+     * @param entityClass エンティティの{@link Class}オブジェクト
+     * @param methodName 実行された{@link DaoContext}のメソッド名
+     * @param execution 計測対象の処理
+     * @param <T> {@code execution} が返す値の型
+     * @return {@code execution} が返した値
+     */
     private <T> T recordTime(String sqlId, Class<?> entityClass, String methodName, Supplier<T> execution) {
         return Timer.builder(metricsName)
                     .description(metricsDescription)

@@ -16,9 +16,16 @@ import java.lang.management.ManagementFactory;
  * @author Tanaka Tomoyuki
  */
 public class JmxGaugeMetrics implements MeterBinder {
+    /** メトリクスのメタ情報。 */
     private final MetricsMetaData metricsMetaData;
+    /** 対象のMBeanを特定するための条件。 */
     private final MBeanAttributeCondition condition;
 
+    /**
+     * コンストラクタ。
+     * @param metricsMetaData メトリクスのメタ情報
+     * @param condition 対象のMBeanを特定するための条件
+     */
     public JmxGaugeMetrics(MetricsMetaData metricsMetaData, MBeanAttributeCondition condition) {
         this.metricsMetaData = metricsMetaData;
         this.condition = condition;
@@ -32,6 +39,13 @@ public class JmxGaugeMetrics implements MeterBinder {
             .register(registry);
     }
 
+    /**
+     * {@link Gauge} に設定する値をMBeanから取得する。
+     * <p>
+     * MBeanが取得できない場合、または取得した値が{@link Number}でない場合は {@code NaN} を返す。
+     * </p>
+     * @return MBeanから取得した値
+     */
     private double obtainGaugeValue() {
         try {
             MBeanServer server = ManagementFactory.getPlatformMBeanServer();

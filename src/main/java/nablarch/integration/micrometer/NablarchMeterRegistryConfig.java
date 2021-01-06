@@ -8,7 +8,9 @@ import nablarch.core.repository.di.DiContainer;
  * @author Tanaka Tomoyuki
  */
 public abstract class NablarchMeterRegistryConfig implements MeterRegistryConfig {
+    /** 設定名のプレフィックス。 */
     private final String prefix;
+    /** 設定値の取得で使用する {@link DiContainer}。 */
     private final DiContainer diContainer;
 
     /**

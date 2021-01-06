@@ -10,11 +10,13 @@ import nablarch.common.dao.DaoContextFactory;
  * @author Tanaka Tomoyuki
  */
 public class SqlTimeMetricsDaoContextFactory extends DaoContextFactory {
-
+    /** 移譲先の{@link DaoContextFactory}。 */
     private DaoContextFactory delegate;
+    /** 使用する{@link MeterRegistry}。 */
     private MeterRegistry meterRegistry;
-
+    /** メトリクス名。 */
     private String metricsName;
+    /** メトリクスの説明。 */
     private String metricsDescription;
 
     @Override

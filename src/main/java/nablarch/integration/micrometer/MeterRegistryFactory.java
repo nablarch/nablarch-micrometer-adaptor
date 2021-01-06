@@ -45,6 +45,24 @@ public abstract class MeterRegistryFactory<T extends MeterRegistry> implements C
      */
     protected ApplicationDisposer applicationDisposer;
 
+    /**
+     * {@link ComponentFactory#createObject()} の実処理を行うメソッド。
+     * <p>
+     * サブクラスは、本メソッドを使って {@code createObject()} を次のように実装する。
+     * <pre><code>{@literal @}Override
+     * public SimpleMeterRegistry createObject() {
+     *     return doCreateObject();
+     * }</code></pre>
+     * </p>
+     * <p>
+     * これは、 {@code createObject()} の戻り値の型が総称型だった場合、
+     * DIコンテナがコンポーネントの具象型を特定できないことに起因する。<br>
+     * この問題は、上述のようにサブクラスで {@code createObject()} の戻り値の型を具象型として宣言することで回避できる。<br>
+     * 一方で、コンポーネントを作成するロジック自体はどの {@link MeterRegistry} でも共通なので、
+     * コンポーネント作成処理を共通化するために、このメソッドが用意されている。
+     * </p>
+     * @return 作成された {@link MeterRegistry} オブジェクト
+     */
     protected T doCreateObject() {
         if (meterBinderListProvider == null) {
             throw new IllegalStateException("MeterBinderListProvider is not set.");
@@ -64,6 +82,10 @@ public abstract class MeterRegistryFactory<T extends MeterRegistry> implements C
         return meterRegistry;
     }
 
+    /**
+     * {@link MicrometerConfiguration} を生成する。
+     * @return 生成された {@link MicrometerConfiguration}
+     */
     private MicrometerConfiguration createMicrometerConfiguration() {
         if (xmlConfigPath == null) {
             return new MicrometerConfiguration();
@@ -72,6 +94,10 @@ public abstract class MeterRegistryFactory<T extends MeterRegistry> implements C
         }
     }
 
+    /**
+     * 全てのメトリクスに共通して設定するタグをセットアップする。
+     * @param meterRegistry 設定対象の {@link MeterRegistry}
+     */
     private void setupCommonTags(MeterRegistry meterRegistry) {
         List<Tag> commonTagList = tags.entrySet()
                 .stream()
