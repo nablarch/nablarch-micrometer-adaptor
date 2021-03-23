@@ -50,6 +50,9 @@ public class TimerMetricsHandler<TData, TResult> implements Handler<TData, TResu
             result = executionContext.handleNext(param);
             return result;
         } catch (Throwable throwable) {
+            // 静的解析でThrowableをcatchしていることについて警告が出るが、
+            // 障害の復旧が目的ではなく情報をメトリクスとして記録しているだけで、
+            // かつ例外はスローしなおしているため指摘は該当しない。
             thrownThrowable = throwable;
             throw throwable;
         } finally {
