@@ -97,6 +97,8 @@ public class HttpRequestTimeMetricsMetaDataBuilder implements HandlerMetricsMeta
          * 参考: https://download.eclipse.org/microprofile/microprofile-metrics-2.3/microprofile-metrics-spec-2.3.html#_optional_rest
          */
         return Arrays.asList(
+            // 静的解析で"UNKNOWN"が重複している警告が出るが、それぞれの"UNKNOWN"は値が同じだけで意味が異なるので指摘は該当しない
+            // （定数化しても、3つの別々の定数を宣言することになる）
             Tag.of("class", clazz != null ? clazz.getName() : "UNKNOWN"),
             Tag.of("method", method != null ? buildMethodTag(method) : "UNKNOWN"),
             Tag.of("httpMethod", request.getMethod()),
