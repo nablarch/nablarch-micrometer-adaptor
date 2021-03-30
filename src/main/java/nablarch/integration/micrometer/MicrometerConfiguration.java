@@ -31,6 +31,7 @@ import java.util.List;
  * @author Tanaka Tomoyuki
  */
 public class MicrometerConfiguration extends DiContainer {
+    /** デフォルトでDIコンテナを使用して読み込む設定ファイルのパス。 */
     private static final String DEFAULT_CONFIG_PATH = "nablarch/integration/micrometer/micrometer.xml";
 
     /**

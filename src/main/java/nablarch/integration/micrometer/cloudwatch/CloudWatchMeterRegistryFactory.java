@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
  */
 public class CloudWatchMeterRegistryFactory extends MeterRegistryFactory<CloudWatchMeterRegistry> {
 
+    /** {@link CloudWatchAsyncClientProvider}。 */
     private CloudWatchAsyncClientProvider cloudWatchAsyncClientProvider = CloudWatchAsyncClient::create;
 
     @Override

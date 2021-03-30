@@ -6,7 +6,7 @@
 
   <groupId>com.nablarch.integration</groupId>
   <artifactId>nablarch-micrometer-adaptor</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 
   <scm>
     <connection>scm:git:git://github.com/nablarch/${project.artifactId}.git</connection>
@@ -17,7 +17,7 @@
   <parent>
     <groupId>com.nablarch</groupId>
     <artifactId>nablarch-parent</artifactId>
-    <version>5u18</version>
+    <version>5u19</version>
   </parent>
 
   <properties>
@@ -75,7 +75,25 @@
 
     <dependency>
       <groupId>com.nablarch.framework</groupId>
+      <artifactId>nablarch-common-dao</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nablarch.framework</groupId>
       <artifactId>nablarch-fw-web</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nablarch.framework</groupId>
+      <artifactId>nablarch-fw-standalone</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.nablarch.framework</groupId>
+      <artifactId>nablarch-core-applog</artifactId>
       <optional>true</optional>
     </dependency>
 
@@ -91,23 +109,17 @@
       <artifactId>jmockit</artifactId>
       <scope>test</scope>
     </dependency>
-    
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.nablarch.framework</groupId>
-      <artifactId>nablarch-core-applog</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>com.nablarch.dev</groupId>
       <artifactId>nablarch-test-support</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+      <version>${version.micrometer}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
