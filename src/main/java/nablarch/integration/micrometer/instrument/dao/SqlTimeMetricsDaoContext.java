@@ -5,7 +5,7 @@ import io.micrometer.core.instrument.Timer;
 import nablarch.common.dao.DaoContext;
 import nablarch.common.dao.EntityList;
 
-import javax.persistence.OptimisticLockException;
+import jakarta.persistence.OptimisticLockException;
 import java.util.List;
 import java.util.function.Supplier;
 

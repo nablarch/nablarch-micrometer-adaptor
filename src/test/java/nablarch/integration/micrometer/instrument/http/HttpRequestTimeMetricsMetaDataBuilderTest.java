@@ -8,7 +8,7 @@ import nablarch.fw.web.HttpRequest;
 import nablarch.fw.web.servlet.ServletExecutionContext;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
