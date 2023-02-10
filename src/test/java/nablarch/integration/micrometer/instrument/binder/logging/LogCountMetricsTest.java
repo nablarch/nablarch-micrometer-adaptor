@@ -11,7 +11,6 @@ import nablarch.core.log.basic.LogPublisher;
 import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
 import org.junit.After;
 import org.junit.Test;
-import sun.rmi.runtime.Log;
 
 import java.util.Arrays;
 
