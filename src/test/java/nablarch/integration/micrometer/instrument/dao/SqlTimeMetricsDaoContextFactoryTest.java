@@ -99,6 +99,11 @@ public class SqlTimeMetricsDaoContextFactoryTest {
         }
 
         @Override
+        public <T> T findByIdOrNull(Class<T> aClass, Object... objects) {
+            return null;
+        }
+
+        @Override
         public <T> EntityList<T> findAll(Class<T> entityClass) {
             return null;
         }
@@ -115,6 +120,11 @@ public class SqlTimeMetricsDaoContextFactoryTest {
 
         @Override
         public <T> T findBySqlFile(Class<T> entityClass, String sqlId, Object params) {
+            return null;
+        }
+
+        @Override
+        public <T> T findBySqlFileOrNull(Class<T> aClass, String s, Object o) {
             return null;
         }
 
