@@ -372,11 +372,37 @@ public class SqlTimeMetricsDaoContextTest {
     }
 
     @Test
+    public void testFindByIdOrNull() {
+        new Expectations() {{
+            daoContext.findByIdOrNull(MockEntity.class, PARAMS); result = MOCK_ENTITY;
+        }};
+
+        MockEntity returnValue = sut.findByIdOrNull(MockEntity.class, PARAMS);
+
+        assertThat(returnValue, is(sameInstance(MOCK_ENTITY)));
+
+        Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
+        assertTimerRecord(timer, SqlTimeMetricsDaoContext.TAG_VALUE_NO_SQL_ID, "findByIdOrNull");
+    }
+
+    @Test
     public void testFindByIdCustomMetricsNameAndDescription() {
         sut.setMetricsName("test.metrics");
         sut.setMetricsDescription("Test metrics.");
 
         sut.findById(MockEntity.class, PARAMS);
+
+        Timer timer = meterRegistry.find("test.metrics").timer();
+
+        assertThat(timer.getId().getDescription(), is("Test metrics."));
+    }
+
+    @Test
+    public void testFindByIdOrNullCustomMetricsNameAndDescription() {
+        sut.setMetricsName("test.metrics");
+        sut.setMetricsDescription("Test metrics.");
+
+        sut.findByIdOrNull(MockEntity.class, PARAMS);
 
         Timer timer = meterRegistry.find("test.metrics").timer();
 
@@ -399,11 +425,38 @@ public class SqlTimeMetricsDaoContextTest {
     }
 
     @Test
+    public void testFindBySqlFileOrNull() {
+        new Expectations() {{
+            daoContext.findBySqlFileOrNull(MockEntity.class, "test-sql-id", PARAM);
+            result = MOCK_ENTITY;
+        }};
+
+        MockEntity returnValue = sut.findBySqlFileOrNull(MockEntity.class, "test-sql-id", PARAM);
+
+        assertThat(returnValue, is(sameInstance(MOCK_ENTITY)));
+
+        Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
+        assertTimerRecord(timer, "test-sql-id", "findBySqlFileOrNull");
+    }
+
+    @Test
     public void testFindBySqlFileCustomMetricsNameAndDescription() {
         sut.setMetricsName("test.metrics");
         sut.setMetricsDescription("Test metrics.");
 
-        sut.findById(MockEntity.class, PARAMS);
+        sut.findBySqlFile(MockEntity.class,"test-sql-id",PARAMS);
+
+        Timer timer = meterRegistry.find("test.metrics").timer();
+
+        assertThat(timer.getId().getDescription(), is("Test metrics."));
+    }
+
+    @Test
+    public void testFindBySqlOrNullFileCustomMetricsNameAndDescription() {
+        sut.setMetricsName("test.metrics");
+        sut.setMetricsDescription("Test metrics.");
+
+        sut.findBySqlFileOrNull(MockEntity.class,"test-sql-id",PARAMS);
 
         Timer timer = meterRegistry.find("test.metrics").timer();
 

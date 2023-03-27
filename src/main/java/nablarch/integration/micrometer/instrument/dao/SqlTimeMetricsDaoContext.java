@@ -68,6 +68,12 @@ public class SqlTimeMetricsDaoContext implements DaoContext {
     }
 
     @Override
+    public <T> T findByIdOrNull(Class<T> entityClass, Object... id) {
+        return recordTime(TAG_VALUE_NO_SQL_ID, entityClass, "findByIdOrNull",
+                () -> delegate.findByIdOrNull(entityClass, id));
+    }
+
+    @Override
     public <T> EntityList<T> findAll(Class<T> entityClass) {
         return recordTime(TAG_VALUE_NO_SQL_ID, entityClass, "findAll",
                 () -> delegate.findAll(entityClass));
@@ -89,6 +95,12 @@ public class SqlTimeMetricsDaoContext implements DaoContext {
     public <T> T findBySqlFile(Class<T> entityClass, String sqlId, Object params) {
         return recordTime(sqlId, entityClass, "findBySqlFile",
                 () -> delegate.findBySqlFile(entityClass, sqlId, params));
+    }
+
+    @Override
+    public <T> T findBySqlFileOrNull(Class<T> entityClass, String sqlId, Object params) {
+        return recordTime(sqlId, entityClass, "findBySqlFileOrNull",
+                () -> delegate.findBySqlFileOrNull(entityClass, sqlId, params));
     }
 
     @Override
