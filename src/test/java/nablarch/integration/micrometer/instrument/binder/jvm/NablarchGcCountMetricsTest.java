@@ -5,43 +5,47 @@ import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import mockit.Expectations;
-import mockit.Mocked;
 import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link NablarchGcCountMetrics}の単体テスト。
  * @author Tanaka Tomoyuki
  */
 public class NablarchGcCountMetricsTest {
-    @Mocked
-    private ManagementFactory managementFactory;
-    @Mocked
-    private GarbageCollectorMXBean garbageCollectorMXBean;
+    private final MockedStatic<ManagementFactory> managementFactoryMockedStatic = Mockito.mockStatic(ManagementFactory.class);
+    private final GarbageCollectorMXBean garbageCollectorMXBean = mock(GarbageCollectorMXBean.class);
 
     private SimpleMeterRegistry registry = new SimpleMeterRegistry();
 
     @Before
     public void setUp() {
-        new Expectations() {{
-            ManagementFactory.getGarbageCollectorMXBeans();
-            result = Arrays.asList(garbageCollectorMXBean, garbageCollectorMXBean);
+        managementFactoryMockedStatic.when(ManagementFactory::getGarbageCollectorMXBeans)
+                .thenReturn(List.of(garbageCollectorMXBean, garbageCollectorMXBean));
 
-            garbageCollectorMXBean.getName();
-            returns("memory-manager-1", "memory-manager-2");
-        }};
+        when(garbageCollectorMXBean.getName()).thenReturn("memory-manager-1", "memory-manager-2");
+    }
+
+    @After
+    public void tearDown() {
+        managementFactoryMockedStatic.close();
     }
 
     @Test
@@ -65,9 +69,7 @@ public class NablarchGcCountMetricsTest {
 
     @Test
     public void testCounterMeasuresCollectionCount() {
-        new Expectations() {{
-            garbageCollectorMXBean.getCollectionCount(); result = 13L;
-        }};
+        when(garbageCollectorMXBean.getCollectionCount()).thenReturn(13L);
 
         NablarchGcCountMetrics metrics = new NablarchGcCountMetrics();
         metrics.bindTo(registry);

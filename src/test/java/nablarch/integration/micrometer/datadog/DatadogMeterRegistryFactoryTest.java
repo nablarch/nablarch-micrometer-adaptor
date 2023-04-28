@@ -1,9 +1,9 @@
 package nablarch.integration.micrometer.datadog;
 
 import io.micrometer.datadog.DatadogMeterRegistry;
-import mockit.Deencapsulation;
 import nablarch.core.repository.disposal.BasicApplicationDisposer;
 import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
+import nablarch.test.support.reflection.ReflectionUtil;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,7 +25,7 @@ public class DatadogMeterRegistryFactoryTest {
 
         DatadogMeterRegistry meterRegistry = sut.createObject();
 
-        NablarchDatadogConfig config = Deencapsulation.getField(meterRegistry, "config");
+        NablarchDatadogConfig config = ReflectionUtil.getFieldValue(meterRegistry, "config");
         assertThat(config.apiKey(), is("datadog-test-api-key"));
     }
 }

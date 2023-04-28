@@ -1,9 +1,9 @@
 package nablarch.integration.micrometer.statsd;
 
 import io.micrometer.statsd.StatsdMeterRegistry;
-import mockit.Deencapsulation;
 import nablarch.core.repository.disposal.BasicApplicationDisposer;
 import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
+import nablarch.test.support.reflection.ReflectionUtil;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,7 +25,7 @@ public class StatsdMeterRegistryFactoryTest {
 
         StatsdMeterRegistry meterRegistry = sut.createObject();
 
-        NablarchStatsdConfig config = Deencapsulation.getField(meterRegistry, "statsdConfig");
+        NablarchStatsdConfig config = ReflectionUtil.getFieldValue(meterRegistry, "statsdConfig");
         assertThat(config.host(), is("test-statsd-host"));
     }
 }
