@@ -1,28 +1,27 @@
 package nablarch.integration.micrometer.instrument.http;
 
 import io.micrometer.core.instrument.Tag;
-import mockit.Expectations;
-import mockit.Mocked;
+import jakarta.servlet.http.HttpServletResponse;
 import nablarch.fw.handler.MethodBinding;
 import nablarch.fw.web.HttpRequest;
 import nablarch.fw.web.servlet.ServletExecutionContext;
 import org.junit.Test;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HttpRequestTimeMetricsMetaDataBuilderTest {
     private static Object RESULT = null;
 
-    @Mocked
-    private HttpRequest request;
-    @Mocked
-    private ServletExecutionContext context;
-    @Mocked
-    private HttpServletResponse servletResponse;
+    private final HttpRequest request = mock(HttpRequest.class);
+    private final ServletExecutionContext context = mock(ServletExecutionContext.class);
+    private final HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 
     private HttpRequestTimeMetricsMetaDataBuilder sut = new HttpRequestTimeMetricsMetaDataBuilder();
 
@@ -50,14 +49,12 @@ public class HttpRequestTimeMetricsMetaDataBuilderTest {
 
     @Test
     public void testStandardCase() {
-        new Expectations() {{
-            context.getServletResponse(); result = servletResponse;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS); result = TestController.class;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD); result = TestController.ACTION_METHOD_WITHOUT_ARGS;
+        when(context.getServletResponse()).thenReturn(servletResponse);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS)).thenReturn(TestController.class);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD)).thenReturn(TestController.ACTION_METHOD_WITHOUT_ARGS);
 
-            request.getMethod(); result = "GET";
-            servletResponse.getStatus(); result = 200;
-        }};
+        when(request.getMethod()).thenReturn("GET");
+        when(servletResponse.getStatus()).thenReturn(200);
 
         List<Tag> tagList = sut.buildTagList(request, context, RESULT, null);
 
@@ -73,14 +70,12 @@ public class HttpRequestTimeMetricsMetaDataBuilderTest {
 
     @Test
     public void testMethodHasArguments() {
-        new Expectations() {{
-            context.getServletResponse(); result = servletResponse;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS); result = TestController.class;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD); result = TestController.ACTION_METHOD_WITH_ARGS;
+        when(context.getServletResponse()).thenReturn(servletResponse);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS)).thenReturn(TestController.class);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD)).thenReturn(TestController.ACTION_METHOD_WITH_ARGS);
 
-            request.getMethod(); result = "GET";
-            servletResponse.getStatus(); result = 404;
-        }};
+        when(request.getMethod()).thenReturn("GET");
+        when(servletResponse.getStatus()).thenReturn(404);
 
         List<Tag> tagList = sut.buildTagList(request, context, RESULT, null);
 
@@ -96,14 +91,12 @@ public class HttpRequestTimeMetricsMetaDataBuilderTest {
 
     @Test
     public void testThrownThrowableIsNotNull() {
-        new Expectations() {{
-            context.getServletResponse(); result = servletResponse;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS); result = TestController.class;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD); result = TestController.ACTION_METHOD_WITHOUT_ARGS;
+        when(context.getServletResponse()).thenReturn(servletResponse);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS)).thenReturn(TestController.class);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD)).thenReturn(TestController.ACTION_METHOD_WITHOUT_ARGS);
 
-            request.getMethod(); result = "POST";
-            servletResponse.getStatus(); result = 500;
-        }};
+        when(request.getMethod()).thenReturn("POST");
+        when(servletResponse.getStatus()).thenReturn(500);
 
         List<Tag> tagList = sut.buildTagList(request, context, RESULT, new NullPointerException("test"));
 
@@ -119,15 +112,13 @@ public class HttpRequestTimeMetricsMetaDataBuilderTest {
 
     @Test
     public void testThrownThrowableIsNullButContextHasException() {
-        new Expectations() {{
-            context.getServletResponse(); result = servletResponse;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS); result = TestController.class;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD); result = TestController.ACTION_METHOD_WITHOUT_ARGS;
-            context.getException(); returns(new IllegalArgumentException("test"), null);
+        when(context.getServletResponse()).thenReturn(servletResponse);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS)).thenReturn(TestController.class);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD)).thenReturn(TestController.ACTION_METHOD_WITHOUT_ARGS);
+        when(context.getException()).thenReturn(new IllegalArgumentException("test"), null);
 
-            request.getMethod(); result = "PUT";
-            servletResponse.getStatus(); result = 500;
-        }};
+        when(request.getMethod()).thenReturn("PUT");
+        when(servletResponse.getStatus()).thenReturn(500);
 
         List<Tag> tagList = sut.buildTagList(request, context, RESULT, null);
 
@@ -143,14 +134,12 @@ public class HttpRequestTimeMetricsMetaDataBuilderTest {
 
     @Test
     public void testClassAndMethodAreNull() {
-        new Expectations() {{
-            context.getServletResponse(); result = servletResponse;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS); result = null;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD); result = null;
+        when(context.getServletResponse()).thenReturn(servletResponse);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS)).thenReturn(null);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD)).thenReturn(null);
 
-            request.getMethod(); result = "GET";
-            servletResponse.getStatus(); result = 200;
-        }};
+        when(request.getMethod()).thenReturn("GET");
+        when(servletResponse.getStatus()).thenReturn(200);
 
         List<Tag> tagList = sut.buildTagList(request, context, RESULT, null);
 
@@ -166,14 +155,12 @@ public class HttpRequestTimeMetricsMetaDataBuilderTest {
 
     @Test
     public void testMethodArgumentFormatArray() {
-        new Expectations() {{
-            context.getServletResponse(); result = servletResponse;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS); result = TestController.class;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD); result = TestController.ACTION_METHOD_ARRAY;
+        when(context.getServletResponse()).thenReturn(servletResponse);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS)).thenReturn(TestController.class);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD)).thenReturn(TestController.ACTION_METHOD_ARRAY);
 
-            request.getMethod(); result = "GET";
-            servletResponse.getStatus(); result = 200;
-        }};
+        when(request.getMethod()).thenReturn("GET");
+        when(servletResponse.getStatus()).thenReturn(200);
 
         List<Tag> tagList = sut.buildTagList(request, context, RESULT, null);
 
@@ -182,14 +169,12 @@ public class HttpRequestTimeMetricsMetaDataBuilderTest {
 
     @Test
     public void testMethodArgumentFormatNestedArray() {
-        new Expectations() {{
-            context.getServletResponse(); result = servletResponse;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS); result = TestController.class;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD); result = TestController.ACTION_METHOD_NESTED_ARRAY;
+        when(context.getServletResponse()).thenReturn(servletResponse);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS)).thenReturn(TestController.class);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD)).thenReturn(TestController.ACTION_METHOD_NESTED_ARRAY);
 
-            request.getMethod(); result = "GET";
-            servletResponse.getStatus(); result = 200;
-        }};
+        when(request.getMethod()).thenReturn("GET");
+        when(servletResponse.getStatus()).thenReturn(200);
 
         List<Tag> tagList = sut.buildTagList(request, context, RESULT, null);
 
@@ -198,14 +183,12 @@ public class HttpRequestTimeMetricsMetaDataBuilderTest {
 
     @Test
     public void testMethodArgumentFormatMemberClass() {
-        new Expectations() {{
-            context.getServletResponse(); result = servletResponse;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS); result = TestController.class;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD); result = TestController.ACTION_METHOD_MEMBER_CLASS;
+        when(context.getServletResponse()).thenReturn(servletResponse);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS)).thenReturn(TestController.class);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD)).thenReturn(TestController.ACTION_METHOD_MEMBER_CLASS);
 
-            request.getMethod(); result = "GET";
-            servletResponse.getStatus(); result = 200;
-        }};
+        when(request.getMethod()).thenReturn("GET");
+        when(servletResponse.getStatus()).thenReturn(200);
 
         List<Tag> tagList = sut.buildTagList(request, context, RESULT, null);
 
@@ -214,14 +197,12 @@ public class HttpRequestTimeMetricsMetaDataBuilderTest {
 
     @Test
     public void testClassFormatMemberClass() {
-        new Expectations() {{
-            context.getServletResponse(); result = servletResponse;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS); result = TestController.MemberController.class;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD); result = TestController.MemberController.ACTION_METHOD;
+        when(context.getServletResponse()).thenReturn(servletResponse);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS)).thenReturn(TestController.MemberController.class);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD)).thenReturn(TestController.MemberController.ACTION_METHOD);
 
-            request.getMethod(); result = "GET";
-            servletResponse.getStatus(); result = 200;
-        }};
+        when(request.getMethod()).thenReturn("GET");
+        when(servletResponse.getStatus()).thenReturn(200);
 
         List<Tag> tagList = sut.buildTagList(request, context, RESULT, null);
 

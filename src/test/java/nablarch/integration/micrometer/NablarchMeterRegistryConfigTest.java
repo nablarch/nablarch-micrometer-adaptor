@@ -1,20 +1,19 @@
 package nablarch.integration.micrometer;
 
-import mockit.Expectations;
-import mockit.Mocked;
 import nablarch.core.repository.di.DiContainer;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link NablarchMeterRegistryConfig}の単体テスト。
  * @author Tanaka Tomoyuki
  */
 public class NablarchMeterRegistryConfigTest {
-    @Mocked
-    private DiContainer diContainer;
+    private final DiContainer diContainer = mock(DiContainer.class);
 
     @Test
     public void testPrefixIsBuiltBySubPrefixIfPrefixIsNull() {
@@ -44,9 +43,7 @@ public class NablarchMeterRegistryConfigTest {
 
     @Test
     public void testGetMethodDelegatesToDiContainer() {
-        new Expectations() {{
-            diContainer.getComponentByName("foo.bar"); result = "FOO_BAR";
-        }};
+        when(diContainer.getComponentByName("foo.bar")).thenReturn("FOO_BAR");
 
         NablarchMeterRegistryConfig sut = new NablarchMeterRegistryConfig(null, diContainer) {
             @Override
