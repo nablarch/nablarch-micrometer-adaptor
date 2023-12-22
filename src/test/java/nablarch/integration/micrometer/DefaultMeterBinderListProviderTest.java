@@ -8,13 +8,13 @@ import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
-import mockit.Expectations;
-import mockit.Mocked;
-import mockit.Verifications;
 import nablarch.integration.micrometer.instrument.binder.jvm.NablarchGcCountMetrics;
 import nablarch.test.support.log.app.OnMemoryLogWriter;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,6 +22,8 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 /**
  * {@link DefaultMeterBinderListProvider}の単体テスト。
@@ -51,8 +53,16 @@ public class DefaultMeterBinderListProviderTest {
         ));
     }
 
-    @Mocked
     private JvmGcMetrics jvmGcMetrics;
+    
+    private final MockedConstruction<JvmGcMetrics> mocked = Mockito.mockConstruction(JvmGcMetrics.class, (mock, context) -> {
+        jvmGcMetrics = mock;
+    });
+
+    @After
+    public void tearDown() {
+        mocked.close();
+    }
 
     @Test
     public void testDisposeAutoCloseableMeterBinder() {
@@ -60,23 +70,19 @@ public class DefaultMeterBinderListProviderTest {
 
         sut.dispose();
 
-        new Verifications() {{
-            jvmGcMetrics.close(); times = 1;
-        }};
+        verify(jvmGcMetrics).close();
     }
 
     @Test
     public void testWarningLogIfCloseThrowsException() {
-        new Expectations() {{
-            jvmGcMetrics.close(); result = new IOException("test IOException");
-        }};
-
         DefaultMeterBinderListProvider sut = new DefaultMeterBinderListProvider();
+        
+        doThrow(new IOException("test IOException")).when(jvmGcMetrics).close();
 
         sut.dispose();
 
         OnMemoryLogWriter.assertLogContains("writer.appLog",
-                "WARN ROOT Failed to close MeterBinder(io.micrometer.core.instrument.binder.jvm.JvmGcMetrics",
+                "WARN ROOT Failed to close MeterBinder(" + jvmGcMetrics + ")",
                 "test IOException");
     }
 }

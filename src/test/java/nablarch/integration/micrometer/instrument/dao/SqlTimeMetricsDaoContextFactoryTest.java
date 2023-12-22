@@ -2,21 +2,18 @@ package nablarch.integration.micrometer.instrument.dao;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import mockit.Expectations;
-import mockit.Mock;
-import mockit.Mocked;
+import jakarta.persistence.OptimisticLockException;
 import nablarch.common.dao.DaoContext;
 import nablarch.common.dao.DaoContextFactory;
 import nablarch.common.dao.EntityList;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.persistence.OptimisticLockException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThrows;
 
 /**

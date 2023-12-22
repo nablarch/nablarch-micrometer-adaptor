@@ -1,9 +1,9 @@
 package nablarch.integration.micrometer.simple;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import mockit.Deencapsulation;
 import nablarch.core.repository.disposal.BasicApplicationDisposer;
 import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
+import nablarch.test.support.reflection.ReflectionUtil;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -27,7 +27,7 @@ public class SimpleMeterRegistryFactoryTest {
 
         SimpleMeterRegistry meterRegistry = sut.createObject();
 
-        NablarchSimpleConfig config = Deencapsulation.getField(meterRegistry, "config");
+        NablarchSimpleConfig config = ReflectionUtil.getFieldValue(meterRegistry, "config");
         assertThat(config.step(), is(Duration.ofSeconds(3456)));
     }
 }

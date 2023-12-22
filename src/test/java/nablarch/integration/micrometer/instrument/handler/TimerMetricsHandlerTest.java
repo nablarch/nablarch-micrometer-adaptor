@@ -6,30 +6,30 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleConfig;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import mockit.Expectations;
-import mockit.Mocked;
 import nablarch.fw.web.servlet.ServletExecutionContext;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link TimerMetricsHandler} の単体テスト。
  * @author Tanaka Tomoyuki
  */
 public class TimerMetricsHandlerTest {
-    @Mocked
-    private ServletExecutionContext context;
-    @Mocked
-    private HandlerMetricsMetaDataBuilder<String, String> metricsInfoBuilder;
+    private final ServletExecutionContext context = mock(ServletExecutionContext.class);
+    @SuppressWarnings("unchecked")
+    private final HandlerMetricsMetaDataBuilder<String, String> metricsInfoBuilder = mock(HandlerMetricsMetaDataBuilder.class);
 
     private static final String PARAM = "REQUEST";
     private static final String RESULT = "RESULT";
@@ -62,10 +62,8 @@ public class TimerMetricsHandlerTest {
 
     @Test
     public void testInvokeNextHandler() {
-        new Expectations() {{
-            metricsInfoBuilder.getMetricsName(); result = METRICS_NAME;
-            context.handleNext(PARAM); result = RESULT;
-        }};
+        when(metricsInfoBuilder.getMetricsName()).thenReturn(METRICS_NAME);
+        when(context.handleNext(PARAM)).thenReturn(RESULT);
 
         String actualResult = sut.handle(PARAM, context);
 
@@ -74,15 +72,14 @@ public class TimerMetricsHandlerTest {
 
     @Test
     public void testMeasureTime() {
-        new Expectations() {{
-            context.handleNext(PARAM); result = RESULT;
+        when(context.handleNext(PARAM)).thenReturn(RESULT);
 
-            metricsInfoBuilder.getMetricsName(); result = METRICS_NAME;
-            metricsInfoBuilder.getMetricsDescription(); result = METRICS_DESCRIPTION;
+        when(metricsInfoBuilder.getMetricsName()).thenReturn(METRICS_NAME);
+        when(metricsInfoBuilder.getMetricsDescription()).thenReturn(METRICS_DESCRIPTION);
 
-            metricsInfoBuilder.buildTagList(PARAM, context, RESULT, null);
-            result = Arrays.asList(Tag.of("foo", "FOO"), Tag.of("bar", "BAR"));
-        }};
+        when(metricsInfoBuilder.buildTagList(PARAM, context, RESULT, null)).thenReturn(
+                List.of(Tag.of("foo", "FOO"), Tag.of("bar", "BAR"))
+        );
 
         sut.handle(PARAM, context);
 
@@ -98,19 +95,18 @@ public class TimerMetricsHandlerTest {
 
     @Test
     public void testMeasureTimeNextHandleThrowsExceptionCase() {
-        Throwable thrown = new Throwable("test throwable");
-        new Expectations() {{
-            context.handleNext(PARAM); result = thrown;
+        RuntimeException exception = new RuntimeException("test exception");
 
-            metricsInfoBuilder.getMetricsName(); result = METRICS_NAME;
-            metricsInfoBuilder.getMetricsDescription(); result = METRICS_DESCRIPTION;
+        when(context.handleNext(PARAM)).thenThrow(exception);
 
-            metricsInfoBuilder.buildTagList(PARAM, context, null, thrown);
-            result = Arrays.asList(Tag.of("fizz", "FIZZ"), Tag.of("buzz", "BUZZ"));
-        }};
+        when(metricsInfoBuilder.getMetricsName()).thenReturn(METRICS_NAME);
+        when(metricsInfoBuilder.getMetricsDescription()).thenReturn(METRICS_DESCRIPTION);
 
-        Throwable throwable = assertThrows(Throwable.class, () -> sut.handle(PARAM, context));
-        assertThat(throwable.getMessage(), is("test throwable"));
+        when(metricsInfoBuilder.buildTagList(PARAM, context, null, exception))
+                .thenReturn(List.of(Tag.of("fizz", "FIZZ"), Tag.of("buzz", "BUZZ")));
+
+        RuntimeException throwable = assertThrows(RuntimeException.class, () -> sut.handle(PARAM, context));
+        assertThat(throwable.getMessage(), is("test exception"));
 
         Timer timer = registry.get(METRICS_NAME).timer();
         assertThat(timer.count(), is(1L));

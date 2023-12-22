@@ -1,9 +1,9 @@
 package nablarch.integration.micrometer.logging;
 
 import io.micrometer.core.instrument.logging.LoggingMeterRegistry;
-import mockit.Deencapsulation;
 import nablarch.core.repository.disposal.BasicApplicationDisposer;
 import nablarch.integration.micrometer.DefaultMeterBinderListProvider;
+import nablarch.test.support.reflection.ReflectionUtil;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,7 +25,7 @@ public class LoggingMeterRegistryFactoryTest {
 
         LoggingMeterRegistry meterRegistry = sut.createObject();
 
-        NablarchLoggingRegistryConfig config = Deencapsulation.getField(meterRegistry, "config");
+        NablarchLoggingRegistryConfig config = ReflectionUtil.getFieldValue(meterRegistry, "config");
         assertThat(config.batchSize(), is(98765));
     }
 }

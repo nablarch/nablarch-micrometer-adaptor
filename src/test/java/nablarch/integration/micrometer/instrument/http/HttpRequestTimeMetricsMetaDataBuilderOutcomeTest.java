@@ -1,8 +1,7 @@
 package nablarch.integration.micrometer.instrument.http;
 
 import io.micrometer.core.instrument.Tag;
-import mockit.Expectations;
-import mockit.Mocked;
+import jakarta.servlet.http.HttpServletResponse;
 import nablarch.fw.handler.MethodBinding;
 import nablarch.fw.web.HttpRequest;
 import nablarch.fw.web.servlet.ServletExecutionContext;
@@ -10,12 +9,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link HttpRequestTimeMetricsMetaDataBuilder}の outcome タグのパターンをテストするクラス。
@@ -41,12 +41,9 @@ public class HttpRequestTimeMetricsMetaDataBuilderOutcomeTest {
         );
     }
 
-    @Mocked
-    private HttpRequest request;
-    @Mocked
-    private HttpServletResponse httpServletResponse;
-    @Mocked
-    private ServletExecutionContext context;
+    private final HttpRequest request = mock(HttpRequest.class);
+    private final HttpServletResponse httpServletResponse = mock(HttpServletResponse.class);
+    private final ServletExecutionContext context = mock(ServletExecutionContext.class);
 
     private final Fixture fixture;
 
@@ -58,14 +55,13 @@ public class HttpRequestTimeMetricsMetaDataBuilderOutcomeTest {
     public void test() {
         HttpRequestTimeMetricsMetaDataBuilder sut = new HttpRequestTimeMetricsMetaDataBuilder();
 
-        new Expectations() {{
-            context.getServletResponse(); result = httpServletResponse;
+        when(context.getServletResponse()).thenReturn(httpServletResponse);
 
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS); result = TestController.class;
-            context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD); result = TestController.ACTION_METHOD_WITHOUT_ARGS;
-            request.getMethod(); result = "PUT";
-            httpServletResponse.getStatus(); result = fixture.statusCode;
-        }};
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_CLASS)).thenReturn(TestController.class);
+        when(context.getRequestScopedVar(MethodBinding.SCOPE_VAR_NAME_BOUND_METHOD)).thenReturn(TestController.ACTION_METHOD_WITHOUT_ARGS);
+
+        when(request.getMethod()).thenReturn("PUT");
+        when(httpServletResponse.getStatus()).thenReturn(fixture.statusCode);
 
         List<Tag> tagList = sut.buildTagList(request, context, null, null);
         assertThat("statusCode=" + fixture.statusCode, tagList, hasItem(Tag.of("outcome", fixture.expectedOutcome)));

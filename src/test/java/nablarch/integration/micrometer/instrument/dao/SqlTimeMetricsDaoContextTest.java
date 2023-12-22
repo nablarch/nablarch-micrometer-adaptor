@@ -5,9 +5,6 @@ import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleConfig;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import mockit.Expectations;
-import mockit.Mocked;
-import mockit.Verifications;
 import nablarch.common.dao.DaoContext;
 import nablarch.common.dao.EntityList;
 import org.junit.Before;
@@ -20,7 +17,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link SqlTimeMetricsDaoContext}の単体テスト。
@@ -33,8 +35,7 @@ public class SqlTimeMetricsDaoContextTest {
     private static final Object PARAM = new Object();
     private static final Object[] PARAMS = new Object[] {new Object(), new Object(), new Object()};
 
-    @Mocked
-    private DaoContext daoContext;
+    private final DaoContext daoContext = mock(DaoContext.class);
 
     private SqlTimeMetricsDaoContext sut;
     private SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry(SimpleConfig.DEFAULT, new Clock() {
@@ -64,9 +65,7 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
         assertTimerRecord(timer, SqlTimeMetricsDaoContext.TAG_VALUE_NO_SQL_ID, "batchDelete");
 
-        new Verifications() {{
-            daoContext.batchDelete(MOCK_ENTITY_LIST); times = 1;
-        }};
+        verify(daoContext).batchDelete(MOCK_ENTITY_LIST);
     }
 
     @Test
@@ -76,10 +75,8 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
 
         assertThat(timer, is(nullValue()));
-
-        new Verifications() {{
-            daoContext.batchDelete(null); times = 1;
-        }};
+        
+        verify(daoContext).batchDelete(null);
     }
 
     @Test
@@ -90,9 +87,7 @@ public class SqlTimeMetricsDaoContextTest {
 
         assertThat(timer, is(nullValue()));
 
-        new Verifications() {{
-            daoContext.batchDelete(EMPTY_ENTITY_LIST); times = 1;
-        }};
+        verify(daoContext).batchDelete(EMPTY_ENTITY_LIST);
     }
 
     @Test
@@ -114,9 +109,7 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
         assertTimerRecord(timer, SqlTimeMetricsDaoContext.TAG_VALUE_NO_SQL_ID, "batchInsert");
 
-        new Verifications() {{
-            daoContext.batchInsert(MOCK_ENTITY_LIST); times = 1;
-        }};
+        verify(daoContext).batchInsert(MOCK_ENTITY_LIST);
     }
 
     @Test
@@ -127,9 +120,7 @@ public class SqlTimeMetricsDaoContextTest {
 
         assertThat(timer, is(nullValue()));
 
-        new Verifications() {{
-            daoContext.batchInsert(null); times = 1;
-        }};
+        verify(daoContext).batchInsert(null);
     }
 
     @Test
@@ -140,9 +131,7 @@ public class SqlTimeMetricsDaoContextTest {
 
         assertThat(timer, is(nullValue()));
 
-        new Verifications() {{
-            daoContext.batchInsert(EMPTY_ENTITY_LIST); times = 1;
-        }};
+        verify(daoContext).batchInsert(EMPTY_ENTITY_LIST);
     }
 
     @Test
@@ -164,9 +153,7 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
         assertTimerRecord(timer, SqlTimeMetricsDaoContext.TAG_VALUE_NO_SQL_ID, "batchUpdate");
 
-        new Verifications() {{
-            daoContext.batchUpdate(MOCK_ENTITY_LIST); times = 1;
-        }};
+        verify(daoContext).batchUpdate(MOCK_ENTITY_LIST);
     }
 
     @Test
@@ -176,10 +163,8 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
 
         assertThat(timer, is(nullValue()));
-
-        new Verifications() {{
-            daoContext.batchUpdate(null); times = 1;
-        }};
+        
+        verify(daoContext).batchUpdate(null);
     }
 
     @Test
@@ -189,10 +174,8 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
 
         assertThat(timer, is(nullValue()));
-
-        new Verifications() {{
-            daoContext.batchUpdate(EMPTY_ENTITY_LIST); times = 1;
-        }};
+        
+        verify(daoContext).batchUpdate(EMPTY_ENTITY_LIST);
     }
 
     @Test
@@ -209,10 +192,7 @@ public class SqlTimeMetricsDaoContextTest {
 
     @Test
     public void testCountBySqlFile() {
-        new Expectations() {{
-            daoContext.countBySqlFile(MockEntity.class, "test-sql-id", PARAM);
-            result = 1234L;
-        }};
+        when(daoContext.countBySqlFile(MockEntity.class, "test-sql-id", PARAM)).thenReturn(1234L);
 
         long returnValue = sut.countBySqlFile(MockEntity.class, "test-sql-id", PARAM);
 
@@ -236,9 +216,7 @@ public class SqlTimeMetricsDaoContextTest {
 
     @Test
     public void testDelete() {
-        new Expectations() {{
-            daoContext.delete(MOCK_ENTITY); result = 321;
-        }};
+        when(daoContext.delete(MOCK_ENTITY)).thenReturn(321);
 
         int returnValue = sut.delete(MOCK_ENTITY);
 
@@ -250,9 +228,7 @@ public class SqlTimeMetricsDaoContextTest {
 
     @Test
     public void testDeleteWhenEntityIsNull() {
-        new Expectations() {{
-            daoContext.delete(null); result = 123;
-        }};
+        when(daoContext.delete(null)).thenReturn(123);
 
         int returnValue = sut.delete(null);
 
@@ -277,9 +253,7 @@ public class SqlTimeMetricsDaoContextTest {
     @Test
     public void testFindAll() {
         EntityList<MockEntity> entityList = new EntityList<>(Arrays.asList(new MockEntity(), new MockEntity()));
-        new Expectations() {{
-            daoContext.findAll(MockEntity.class); result = entityList;
-        }};
+        when(daoContext.findAll(MockEntity.class)).thenReturn(entityList);
 
         EntityList<MockEntity> returnValue = sut.findAll(MockEntity.class);
 
@@ -304,10 +278,7 @@ public class SqlTimeMetricsDaoContextTest {
     @Test
     public void testFindAllBySqlFile() {
         EntityList<MockEntity> entityList = new EntityList<>(Arrays.asList(new MockEntity(), new MockEntity()));
-        new Expectations() {{
-            daoContext.findAllBySqlFile(MockEntity.class, "test-sql-id", PARAM);
-            result = entityList;
-        }};
+        when(daoContext.findAllBySqlFile(MockEntity.class, "test-sql-id", PARAM)).thenReturn(entityList);
 
         EntityList<MockEntity> returnValue = sut.findAllBySqlFile(MockEntity.class, "test-sql-id", PARAM);
 
@@ -332,10 +303,7 @@ public class SqlTimeMetricsDaoContextTest {
     @Test
     public void testFindAllBySqlFileWithoutParams() {
         EntityList<MockEntity> entityList = new EntityList<>(Arrays.asList(new MockEntity(), new MockEntity()));
-        new Expectations() {{
-            daoContext.findAllBySqlFile(MockEntity.class, "test-sql-id");
-            result = entityList;
-        }};
+        when(daoContext.findAllBySqlFile(MockEntity.class, "test-sql-id")).thenReturn(entityList);
 
         EntityList<MockEntity> returnValue = sut.findAllBySqlFile(MockEntity.class, "test-sql-id");
 
@@ -359,9 +327,7 @@ public class SqlTimeMetricsDaoContextTest {
 
     @Test
     public void testFindById() {
-        new Expectations() {{
-            daoContext.findById(MockEntity.class, PARAMS); result = MOCK_ENTITY;
-        }};
+        when(daoContext.findById(MockEntity.class, PARAMS)).thenReturn(MOCK_ENTITY);
 
         MockEntity returnValue = sut.findById(MockEntity.class, PARAMS);
 
@@ -373,9 +339,7 @@ public class SqlTimeMetricsDaoContextTest {
 
     @Test
     public void testFindByIdOrNull() {
-        new Expectations() {{
-            daoContext.findByIdOrNull(MockEntity.class, PARAMS); result = MOCK_ENTITY;
-        }};
+        when(daoContext.findByIdOrNull(MockEntity.class, PARAMS)).thenReturn(MOCK_ENTITY);
 
         MockEntity returnValue = sut.findByIdOrNull(MockEntity.class, PARAMS);
 
@@ -411,10 +375,7 @@ public class SqlTimeMetricsDaoContextTest {
 
     @Test
     public void testFindBySqlFile() {
-        new Expectations() {{
-            daoContext.findBySqlFile(MockEntity.class, "test-sql-id", PARAM);
-            result = MOCK_ENTITY;
-        }};
+        when(daoContext.findBySqlFile(MockEntity.class, "test-sql-id", PARAM)).thenReturn(MOCK_ENTITY);
 
         MockEntity returnValue = sut.findBySqlFile(MockEntity.class, "test-sql-id", PARAM);
 
@@ -426,10 +387,7 @@ public class SqlTimeMetricsDaoContextTest {
 
     @Test
     public void testFindBySqlFileOrNull() {
-        new Expectations() {{
-            daoContext.findBySqlFileOrNull(MockEntity.class, "test-sql-id", PARAM);
-            result = MOCK_ENTITY;
-        }};
+        when(daoContext.findBySqlFileOrNull(MockEntity.class, "test-sql-id", PARAM)).thenReturn(MOCK_ENTITY);
 
         MockEntity returnValue = sut.findBySqlFileOrNull(MockEntity.class, "test-sql-id", PARAM);
 
@@ -465,9 +423,7 @@ public class SqlTimeMetricsDaoContextTest {
 
     @Test
     public void testUpdate() {
-        new Expectations() {{
-            daoContext.update(MOCK_ENTITY); result = 33;
-        }};
+        when(daoContext.update(MOCK_ENTITY)).thenReturn(33);
 
         int returnValue = sut.update(MOCK_ENTITY);
 
@@ -479,9 +435,7 @@ public class SqlTimeMetricsDaoContextTest {
 
     @Test
     public void testUpdateWhenEntityIsNull() {
-        new Expectations() {{
-            daoContext.update(null); result = 44;
-        }};
+        when(daoContext.update(null)).thenReturn(44);
 
         int returnValue = sut.update(null);
 
@@ -510,9 +464,7 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
         assertTimerRecord(timer, SqlTimeMetricsDaoContext.TAG_VALUE_NO_SQL_ID, "insert");
 
-        new Verifications() {{
-            daoContext.insert(MOCK_ENTITY); times = 1;
-        }};
+        verify(daoContext).insert(MOCK_ENTITY);
     }
 
     @Test
@@ -522,9 +474,7 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
         assertThat(timer, is(nullValue()));
 
-        new Verifications() {{
-            daoContext.insert(null); times = 1;
-        }};
+        verify(daoContext).insert(null);
     }
 
     @Test
@@ -548,9 +498,7 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
         assertThat(timer, is(nullValue()));
 
-        new Verifications() {{
-            daoContext.page(40L); times = 1;
-        }};
+        verify(daoContext).page(40L);
     }
 
     @Test
@@ -562,9 +510,7 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
         assertThat(timer, is(nullValue()));
 
-        new Verifications() {{
-            daoContext.per(30L); times = 1;
-        }};
+        verify(daoContext).per(30L);
     }
 
     @Test
@@ -576,9 +522,7 @@ public class SqlTimeMetricsDaoContextTest {
         Timer timer = meterRegistry.find(SqlTimeMetricsDaoContext.DEFAULT_METRICS_NAME).timer();
         assertThat(timer, is(nullValue()));
 
-        new Verifications() {{
-            daoContext.defer(); times = 1;
-        }};
+        verify(daoContext).defer();
     }
 
     @Test

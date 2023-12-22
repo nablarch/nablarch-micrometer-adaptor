@@ -7,7 +7,7 @@ import nablarch.fw.web.HttpRequest;
 import nablarch.fw.web.servlet.ServletExecutionContext;
 import nablarch.integration.micrometer.instrument.handler.HandlerMetricsMetaDataBuilder;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
