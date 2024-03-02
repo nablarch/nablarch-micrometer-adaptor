@@ -24,7 +24,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <version.micrometer>1.5.4</version.micrometer>
+    <version.micrometer>1.9.17</version.micrometer>
   </properties>
 
   <profiles>
@@ -64,6 +64,13 @@
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-statsd</artifactId>
+      <version>${version.micrometer}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-otlp</artifactId>
       <version>${version.micrometer}</version>
       <optional>true</optional>
     </dependency>
