@@ -42,9 +42,9 @@ public class BatchTransactionTimeMetricsLogger implements CommitLogger {
     public void increment(long count) {
         Timer.Sample sample = (Timer.Sample)ThreadContext.getObject(THREAD_CONTEXT_KEY_TIMER_SAMPLE);
         Tag batchClass = BatchActionClassTagUtil.obtain(ThreadContext.getRequestId());
-        sample.stop(meterRegistry, Timer.builder(metricsName)
+        sample.stop(Timer.builder(metricsName)
                 .description(metricsDescription)
-                .tags(Tags.of(batchClass)));
+                .tags(Tags.of(batchClass)).register(meterRegistry));
 
         beginTimer();
     }
