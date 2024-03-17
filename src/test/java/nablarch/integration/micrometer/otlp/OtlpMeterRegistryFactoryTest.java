@@ -1,5 +1,6 @@
 package nablarch.integration.micrometer.otlp;
 
+import io.micrometer.core.instrument.config.validate.ValidationException;
 import io.micrometer.registry.otlp.OtlpMeterRegistry;
 import mockit.Deencapsulation;
 import nablarch.core.repository.disposal.BasicApplicationDisposer;
@@ -11,6 +12,7 @@ import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThrows;
 
 /**
  * {@link OtlpMeterRegistryFactory}の単体テスト。
@@ -43,6 +45,10 @@ public class OtlpMeterRegistryFactoryTest {
                 hasEntry("url.scheme", "http"),
                 hasEntry("service.version", "v1alpha1")
         ));
+        assertThat(config.headers(), allOf(
+                hasEntry("key1", "value1"),
+                hasEntry("key2", "value2_")
+        ));
 
         assertThat(config.validate().failures(), empty());
         assertThat(config.validate().isValid(), is(true));
@@ -65,6 +71,7 @@ public class OtlpMeterRegistryFactoryTest {
 
         // From NablarchOtlpConfig
         assertThat(config.subPrefix(), is("otlp"));
+        assertThat(config.headers(), is(Collections.<String, String>emptyMap()));
         // From NablarchMeterRegistryConfig
         assertThat(config.prefix(), allOf(
                 is(String.join(".", "nablarch.micrometer", config.subPrefix())),
@@ -80,5 +87,20 @@ public class OtlpMeterRegistryFactoryTest {
 
         assertThat(config.validate().failures(), empty());
         assertThat(config.validate().isValid(), is(true));
+    }
+
+    /**
+     * 精査エラーとなるpropertiesファイルを設定した時のテストケース。
+     * @author Junya Koyama
+     */
+    @Test
+    public void testInvalid() {
+        OtlpMeterRegistryFactory sut = new OtlpMeterRegistryFactory();
+        sut.setApplicationDisposer(new BasicApplicationDisposer());
+        sut.setMeterBinderListProvider(new DefaultMeterBinderListProvider());
+        sut.setPrefix("test.otlp");
+        sut.setXmlConfigPath("nablarch/integration/micrometer/otlp/OtlpMeterRegistryFactory/testCreateObject/test.invalid.xml");
+
+        assertThrows("headers: Invalid key-value", ValidationException.class, sut::createObject);
     }
 }
