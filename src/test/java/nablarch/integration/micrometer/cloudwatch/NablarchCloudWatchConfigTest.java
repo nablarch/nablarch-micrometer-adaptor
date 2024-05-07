@@ -1,6 +1,5 @@
 package nablarch.integration.micrometer.cloudwatch;
 
-import nablarch.integration.micrometer.datadog.DatadogMeterRegistryFactory;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

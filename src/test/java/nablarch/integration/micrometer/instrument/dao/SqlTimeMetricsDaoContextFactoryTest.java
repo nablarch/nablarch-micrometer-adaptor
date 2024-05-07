@@ -2,13 +2,9 @@ package nablarch.integration.micrometer.instrument.dao;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import mockit.Expectations;
-import mockit.Mock;
-import mockit.Mocked;
 import nablarch.common.dao.DaoContext;
 import nablarch.common.dao.DaoContextFactory;
 import nablarch.common.dao.EntityList;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
