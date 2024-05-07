@@ -11,6 +11,7 @@ import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
 import nablarch.core.repository.disposal.Disposable;
+import nablarch.core.util.annotation.Published;
 import nablarch.integration.micrometer.instrument.binder.jvm.NablarchGcCountMetrics;
 
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import java.util.List;
  * </p>
  * @author Tanaka Tomoyuki
  */
+@Published(tag = "architect")
 public class DefaultMeterBinderListProvider implements MeterBinderListProvider, Disposable {
     /** ロガー。 */
     private static final Logger LOGGER = LoggerManager.get(DefaultMeterBinderListProvider.class);

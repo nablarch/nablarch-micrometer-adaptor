@@ -1,9 +1,12 @@
 package nablarch.integration.micrometer.instrument.binder.jmx;
 
+import nablarch.core.util.annotation.Published;
+
 /**
  * JMXで取得するMBeanのAttributeを特定するための、オブジェクト名と属性名を保持したデータクラス。
  * @author Tanaka Tomoyuki
  */
+@Published(tag = "architect")
 public class MBeanAttributeCondition {
     /** オブジェクト名。 */
     private final String objectName;
