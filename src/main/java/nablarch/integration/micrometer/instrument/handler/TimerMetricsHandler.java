@@ -8,7 +8,6 @@ import nablarch.fw.Handler;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * ハンドラキューに追加することで、後続処理の実行時間をメトリクスとして収集するハンドラクラス。

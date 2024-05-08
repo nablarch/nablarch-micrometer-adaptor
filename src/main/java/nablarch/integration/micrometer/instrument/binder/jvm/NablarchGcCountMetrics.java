@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.FunctionCounter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.MeterBinder;
+import nablarch.core.util.annotation.Published;
 import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
 
 import java.lang.management.GarbageCollectorMXBean;
@@ -19,6 +20,7 @@ import java.util.List;
  * </p>
  * @author Tanaka Tomoyuki
  */
+@Published(tag = "architect")
 public class NablarchGcCountMetrics implements MeterBinder {
     /** デフォルトのメトリクス名。 */
     static final String DEFAULT_METRICS_NAME = "jvm.gc.count";

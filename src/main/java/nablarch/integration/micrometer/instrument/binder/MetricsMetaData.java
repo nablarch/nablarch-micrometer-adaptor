@@ -1,6 +1,7 @@
 package nablarch.integration.micrometer.instrument.binder;
 
 import io.micrometer.core.instrument.Tag;
+import nablarch.core.util.annotation.Published;
 
 import java.util.Collections;
 
@@ -9,6 +10,7 @@ import java.util.Collections;
  *
  * @author Tanaka Tomoyuki
  */
+@Published(tag = "architect")
 public class MetricsMetaData {
     /** メトリクス名。 */
     private final String name;

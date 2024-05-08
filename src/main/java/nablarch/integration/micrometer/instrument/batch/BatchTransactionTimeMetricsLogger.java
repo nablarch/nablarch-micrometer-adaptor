@@ -7,8 +7,6 @@ import io.micrometer.core.instrument.Timer;
 import nablarch.core.ThreadContext;
 import nablarch.core.log.app.CommitLogger;
 
-import java.util.Collections;
-
 /**
  * バッチのトランザクションごとの処理時間をメトリクスとして計測するロガー。
  * <p>
