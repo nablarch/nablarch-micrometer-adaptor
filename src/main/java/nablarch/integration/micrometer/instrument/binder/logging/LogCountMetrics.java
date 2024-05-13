@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.binder.MeterBinder;
 import nablarch.core.log.basic.LogLevel;
 import nablarch.core.log.basic.LogListener;
 import nablarch.core.log.basic.LogPublisher;
+import nablarch.core.util.annotation.Published;
 import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
 
 import java.io.Closeable;
@@ -25,6 +26,7 @@ import java.io.Closeable;
  * </p>
  * @author Tanaka Tomoyuki
  */
+@Published(tag = "architect")
 public class LogCountMetrics implements MeterBinder, Closeable {
     /** デフォルトのメトリクスの名前。 */
     static final String DEFAULT_METRICS_NAME = "log.count";
