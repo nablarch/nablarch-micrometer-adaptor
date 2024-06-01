@@ -4,10 +4,6 @@ import io.micrometer.registry.otlp.OtlpConfig;
 import nablarch.core.repository.di.DiContainer;
 import nablarch.integration.micrometer.NablarchMeterRegistryConfig;
 
-import java.time.Duration;
-import java.util.Map;
-import java.util.Optional;
-
 /**
  * {@link NablarchMeterRegistryConfig}を用いて{@link OtlpConfig}を実装したクラス。
  * @author Junya Koyama

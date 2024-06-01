@@ -6,7 +6,7 @@
 
   <groupId>com.nablarch.integration</groupId>
   <artifactId>nablarch-micrometer-adaptor</artifactId>
-  <version>1.2.0</version>
+  <version>5-NEXT-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:git://github.com/nablarch/${project.artifactId}.git</connection>
@@ -17,14 +17,25 @@
   <parent>
     <groupId>com.nablarch</groupId>
     <artifactId>nablarch-parent</artifactId>
-    <version>5u24</version>
+    <version>5-NEXT-SNAPSHOT</version>
   </parent>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.micrometer</groupId>
+        <artifactId>micrometer-bom</artifactId>
+        <version>1.13.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <version.micrometer>1.13.0</version.micrometer>
   </properties>
 
   <profiles>
@@ -44,34 +55,29 @@
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-core</artifactId>
-      <version>${version.micrometer}</version>
     </dependency>
 
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-datadog</artifactId>
-      <version>${version.micrometer}</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-cloudwatch2</artifactId>
-      <version>${version.micrometer}</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-statsd</artifactId>
-      <version>${version.micrometer}</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-otlp</artifactId>
-      <version>${version.micrometer}</version>
       <optional>true</optional>
     </dependency>
 
@@ -126,7 +132,6 @@
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-prometheus</artifactId>
-      <version>${version.micrometer}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

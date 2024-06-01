@@ -16,7 +16,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertThrows;
 
 /**
@@ -27,7 +31,6 @@ public class OtlpMeterRegistryFactoryTest {
 
     /**
      * 空ではないpropertiesファイルを設定した時のテストケース。
-     * @author Junya Koyama
      */
     @Test
     public void testCreateObject() {
@@ -60,7 +63,6 @@ public class OtlpMeterRegistryFactoryTest {
 
     /**
      * 空ではない、精査エラーとなるpropertiesファイルを設定した時のテストケース。
-     * @author Junya Koyama
      */
     @Test
     public void testInvalid() {
@@ -81,7 +83,6 @@ public class OtlpMeterRegistryFactoryTest {
 
     /**
      * 空のpropertiesファイルを設定し、環境変数も設定しない時のテストケース。
-     * @author Junya Koyama
      */
     @Test
     public void testDefault() {

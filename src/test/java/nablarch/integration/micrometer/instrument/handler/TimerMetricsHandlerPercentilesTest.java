@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.*;
 
 /**
  * {@link TimerMetricsHandler}のパーセンタイルに関する設定のテストを行う単体テスト。
- * @author Junya Koyama
+ * @author Tanaka Tomoyuki
  */
 public class TimerMetricsHandlerPercentilesTest {
     private final ExecutionContext context = new ExecutionContext();
