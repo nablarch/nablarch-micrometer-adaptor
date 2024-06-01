@@ -98,10 +98,7 @@ public class OtlpMeterRegistryFactoryTest {
         // From NablarchOtlpConfig
         assertThat(config.subPrefix(), is("otlp"));
         // From NablarchMeterRegistryConfig
-        assertThat(config.prefix(), allOf(
-                is(String.join(".", "nablarch.micrometer", config.subPrefix())),
-                is("nablarch.micrometer.otlp")
-        ));
+        assertThat(config.prefix(), is("nablarch.micrometer.otlp"));
         // From OtlpConfig
         assertThat(config.aggregationTemporality(), is(AggregationTemporality.CUMULATIVE));
         assertThat(config.baseTimeUnit(), is(TimeUnit.MILLISECONDS));
