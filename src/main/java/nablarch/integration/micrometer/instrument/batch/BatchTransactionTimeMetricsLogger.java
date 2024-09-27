@@ -7,8 +7,6 @@ import io.micrometer.core.instrument.Timer;
 import nablarch.core.ThreadContext;
 import nablarch.core.log.app.CommitLogger;
 
-import java.util.Collections;
-
 /**
  * バッチのトランザクションごとの処理時間をメトリクスとして計測するロガー。
  * <p>
@@ -42,9 +40,9 @@ public class BatchTransactionTimeMetricsLogger implements CommitLogger {
     public void increment(long count) {
         Timer.Sample sample = (Timer.Sample)ThreadContext.getObject(THREAD_CONTEXT_KEY_TIMER_SAMPLE);
         Tag batchClass = BatchActionClassTagUtil.obtain(ThreadContext.getRequestId());
-        sample.stop(meterRegistry, Timer.builder(metricsName)
+        sample.stop(Timer.builder(metricsName)
                 .description(metricsDescription)
-                .tags(Tags.of(batchClass)));
+                .tags(Tags.of(batchClass)).register(meterRegistry));
 
         beginTimer();
     }

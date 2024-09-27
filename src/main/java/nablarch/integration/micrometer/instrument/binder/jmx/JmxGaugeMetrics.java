@@ -3,6 +3,7 @@ package nablarch.integration.micrometer.instrument.binder.jmx;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.MeterBinder;
+import nablarch.core.util.annotation.Published;
 import nablarch.integration.micrometer.instrument.binder.MetricsMetaData;
 
 import javax.management.JMException;
@@ -15,6 +16,7 @@ import java.lang.management.ManagementFactory;
  *
  * @author Tanaka Tomoyuki
  */
+@Published(tag = "architect")
 public class JmxGaugeMetrics implements MeterBinder {
     /** メトリクスのメタ情報。 */
     private final MetricsMetaData metricsMetaData;
