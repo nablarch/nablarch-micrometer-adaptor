@@ -1,6 +1,7 @@
 package nablarch.integration.micrometer.instrument.handler;
 
 import io.micrometer.core.instrument.Tag;
+import nablarch.core.util.annotation.Published;
 import nablarch.fw.ExecutionContext;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
  * @param <TResult> 処理結果データ型
  * @author Tanaka Tomoyuki
  */
+@Published(tag = "architect")
 public interface HandlerMetricsMetaDataBuilder<TData, TResult> {
 
     /**

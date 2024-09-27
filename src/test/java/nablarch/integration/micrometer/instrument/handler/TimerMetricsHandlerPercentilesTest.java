@@ -1,11 +1,11 @@
 package nablarch.integration.micrometer.instrument.handler;
 
+import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.distribution.CountAtBucket;
 import io.micrometer.core.instrument.distribution.ValueAtPercentile;
-import io.micrometer.prometheus.PrometheusConfig;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
+import io.micrometer.registry.otlp.OtlpConfig;
+import io.micrometer.registry.otlp.OtlpMeterRegistry;
 import nablarch.fw.ExecutionContext;
 import nablarch.fw.Handler;
 import org.junit.Before;
@@ -30,9 +30,7 @@ public class TimerMetricsHandlerPercentilesTest {
 
     private final TimerMetricsHandler<String, String> sut = new TimerMetricsHandler<>();
 
-    // SimpleMeterRegistry はパーセンタイル近似をサポートしない設定のため、ヒストグラムのバケットが取得できない。
-    // このため本テストでは、パーセンタイル近似をサポートしているPrometheusMeterRegistryを利用している。
-    private final PrometheusMeterRegistry meterRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+    private final OtlpMeterRegistry meterRegistry = new OtlpMeterRegistry(OtlpConfig.DEFAULT, Clock.SYSTEM);
 
     @Before
     public void setUp() {
@@ -50,6 +48,7 @@ public class TimerMetricsHandlerPercentilesTest {
 
         Timer timer = meterRegistry.find(metricsMetaDataBuilder.getMetricsName()).timer();
 
+        assertThat(timer,notNullValue());
         ValueAtPercentile[] valueAtPercentiles = timer.takeSnapshot().percentileValues();
         assertThat(valueAtPercentiles, arrayWithSize(2));
 
@@ -65,6 +64,7 @@ public class TimerMetricsHandlerPercentilesTest {
 
         Timer timer = meterRegistry.find(metricsMetaDataBuilder.getMetricsName()).timer();
 
+        assertThat(timer,notNullValue());
         assertThat(timer.takeSnapshot().histogramCounts(), is(emptyArray()));
     }
 
@@ -76,6 +76,7 @@ public class TimerMetricsHandlerPercentilesTest {
 
         Timer timer = meterRegistry.find(metricsMetaDataBuilder.getMetricsName()).timer();
 
+        assertThat(timer,notNullValue());
         assertThat(timer.takeSnapshot().histogramCounts(), is(not(emptyArray())));
     }
 
@@ -88,6 +89,7 @@ public class TimerMetricsHandlerPercentilesTest {
 
         Timer timer = meterRegistry.find(metricsMetaDataBuilder.getMetricsName()).timer();
 
+        assertThat(timer,notNullValue());
         List<Double> buckets = Stream.of(timer.takeSnapshot().histogramCounts()).map(cab -> cab.bucket(TimeUnit.MILLISECONDS)).collect(Collectors.toList());
         assertThat(buckets, hasItems(90000.0, 99000.0));
     }
@@ -101,6 +103,7 @@ public class TimerMetricsHandlerPercentilesTest {
 
         Timer timer = meterRegistry.find(metricsMetaDataBuilder.getMetricsName()).timer();
 
+        assertThat(timer,notNullValue());
         List<Double> buckets = Stream.of(timer.takeSnapshot().histogramCounts()).map(cab -> cab.bucket(TimeUnit.MILLISECONDS)).collect(Collectors.toList());
         assertThat(buckets, hasItems(987.0));
     }
@@ -114,11 +117,12 @@ public class TimerMetricsHandlerPercentilesTest {
 
         Timer timer = meterRegistry.find(metricsMetaDataBuilder.getMetricsName()).timer();
 
+        assertThat(timer,notNullValue());
         List<Double> buckets = Stream.of(timer.takeSnapshot().histogramCounts()).map(cab -> cab.bucket(TimeUnit.MILLISECONDS)).collect(Collectors.toList());
         assertThat(buckets, hasItems(45678.0));
     }
 
-    private HandlerMetricsMetaDataBuilder<String, String> metricsMetaDataBuilder = new HandlerMetricsMetaDataBuilder<String, String>() {
+    private final HandlerMetricsMetaDataBuilder<String, String> metricsMetaDataBuilder = new HandlerMetricsMetaDataBuilder<String, String>() {
         @Override
         public String getMetricsName() {
             return "test.metrics";
